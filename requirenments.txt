@@ -1,0 +1,5 @@
+requests
+kagglehub
+pandas
+os
+shutil
