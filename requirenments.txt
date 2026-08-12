@@ -1,5 +1,9 @@
 requests
-kagglehub
 pandas
 os
 shutil
+dataclasses
+dataclasses_json 
+datetime 
+psycopg2
+datetime

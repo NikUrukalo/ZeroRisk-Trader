@@ -5,7 +5,6 @@ GRANT CONNECT ON DATABASE sem2026_nejczi TO nikuru;
 GRANT CONNECT ON DATABASE sem2026_nejczi TO javnost;
 
 
-
 /* Table Creation */
 
 CREATE TABLE IF NOT EXISTS app_user (
@@ -28,7 +27,9 @@ CREATE TABLE IF NOT EXISTS asset (
     asset_name TEXT NOT NULL,
     asset_symbol TEXT UNIQUE NOT NULL,
     asset_type TEXT NOT NULL, -- e.g., stock, bond, cryptocurrency
-    current_price NUMERIC(10, 2) NOT NULL
+    price NUMERIC(10, 2) NOT NULL,
+    date_stamp DATE NOT NULL,
+    time_stamp TIME NOT NULL
 );
 
 CREATE TABLE IF NOT EXISTS trade (
