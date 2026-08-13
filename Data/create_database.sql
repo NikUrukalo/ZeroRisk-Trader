@@ -1,6 +1,7 @@
 /* Permissions */
 
 GRANT ALL ON DATABASE sem2026_nejczi TO nikuru WITH GRANT OPTION;
+GRANT ALL ON DATABASE sem2026_nejczi TO javnost WITH GRANT OPTION;
 GRANT CONNECT ON DATABASE sem2026_nejczi TO nikuru;
 GRANT CONNECT ON DATABASE sem2026_nejczi TO javnost;
 
@@ -50,3 +51,8 @@ CREATE TABLE IF NOT EXISTS position (
 	avg_buy_price NUMERIC(10, 2) NOT NULL,
 	UNIQUE (portfolio_id, asset_id) -- so that we have all assets in a portfolio together
 );
+
+INSERT INTO asset (asset_name, asset_symbol, asset_type, price, date_stamp, time_stamp)
+VALUES ('test_etf', 'TEST4', 'ETF', 424.2, '2026-08-12', '21:49:20');
+
+select * from asset
