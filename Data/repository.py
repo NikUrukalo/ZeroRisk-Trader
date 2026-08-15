@@ -3,10 +3,6 @@
 # Functions to interact with database.
 ######################################
 
-<<<<<<< HEAD
-=======
-# libraries
->>>>>>> 8333f89c97f2e784d5a91cff4bc8d344220d2181
 import psycopg2, psycopg2.extensions, psycopg2.extras # PostgreSQL database adapter for the Python and extensions
 psycopg2.extensions.register_type(psycopg2.extensions.UNICODE) # a fix for šumniki (č, š, ž)
 from Data import auth_public as auth
@@ -16,13 +12,7 @@ from Data.models import *
 from typing import List, Optional # library for type hints
 
 DB_PORT = os.environ.get('POSTGRES_PORT', 5432) # default PostgreSQL port
-<<<<<<< HEAD
 
-=======
-    
-
-# class definition
->>>>>>> 8333f89c97f2e784d5a91cff4bc8d344220d2181
 
 class Repo:
     def __init__(self):
@@ -63,7 +53,7 @@ class Repo:
         row = self.cur.fetchone() # returns a dictionary or None
         return App_User.from_dict(row) if row else None # turns dictionary into python object
 
-    # ---------- portfolio ----------
+    # portfolio 
 
     def insert_portfolio(self, user_id: int, initial_balance: float) -> int:
         self.cur.execute("""
@@ -83,7 +73,8 @@ class Repo:
             WHERE user_id = %s
         """, (user_id,))
 
-        return self.cur.fetchone()['virtual_balance']
+        dictionary = self.cur.fetchone()
+        return dictionary['virtual_balance']
 
     def update_balance(self, user_id: int, delta: float) -> None:
         self.cur.execute("""
@@ -94,7 +85,7 @@ class Repo:
 
         self.conn.commit()
 
-    # ---------- assets ----------
+    # assets 
 
     def get_all_assets(self) -> List[Asset]:
         self.cur.execute("""
@@ -128,7 +119,6 @@ class Repo:
         the asset table. Might return fewer than 2 rows — the caller decides
         what that means.
         """
-<<<<<<< HEAD
         self.cur.execute("""
             SELECT DISTINCT date_stamp, time_stamp
             FROM asset
@@ -162,46 +152,6 @@ class Repo:
         """, (portfolio_id, asset_symbol, trade_type, quantity, price))
 
         self.conn.commit()
-=======
-
-        try:
-            # SELL cannot create a new position
-            if trade_type == "SELL":
-                print("Cannot SELL an asset when no position exists.")
-                return False
-
-            if trade_type != "BUY":
-                print("trade_type must be BUY or SELL")
-                return False
-
-            # calculate avg_buy_price from BUY trades
-            avg_buy_price = self.calculate_avg_price(portfolio_id, asset_symbol)
-
-            # insert new position
-            self.cur.execute("""
-                INSERT INTO position (portfolio_id, asset_symbol, quantity, avg_buy_price)
-                VALUES (%s, %s, %s, %s)
-            """, (portfolio_id, asset_symbol, quantity, avg_buy_price))
-
-            self.conn.commit()
-            print("New position created successfully.")
-            return True
-
-        except Exception as e:
-            print(f"Error creating new position: {e}")
-            return False
-
-
-
-
-
-    
-
-
-
-
-    
->>>>>>> 8333f89c97f2e784d5a91cff4bc8d344220d2181
 
     def get_buy_trades(self, portfolio_id: int, asset_symbol: str) -> List[Trade]:
         self.cur.execute("""
