@@ -38,7 +38,7 @@ class Portfolio:
 @dataclass
 class PortfolioDto:
     portfolio_id: int = field(default=0)
-    virtual_balance: float
+    virtual_balance: float = field(default=0)
 
 
 ### Asset

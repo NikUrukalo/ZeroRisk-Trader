@@ -1,9 +1,10 @@
 /* Permissions */
 
 GRANT ALL ON DATABASE sem2026_nejczi TO nikuru WITH GRANT OPTION;
-GRANT ALL ON DATABASE sem2026_nejczi TO javnost WITH GRANT OPTION;
 GRANT CONNECT ON DATABASE sem2026_nejczi TO nikuru;
 GRANT CONNECT ON DATABASE sem2026_nejczi TO javnost;
+
+GRANT SELECT ON TABLE asset TO javnost;
 
 
 /* Table Creation */
