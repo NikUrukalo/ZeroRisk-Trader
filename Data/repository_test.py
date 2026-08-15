@@ -12,3 +12,10 @@ repo = Repo()
 assets = repo.get_all_assets()
 for t in assets:
     print(t)
+
+repo.create_account('test_user', 'test_user', 'password')
+
+repo.log_in('test_user', 'password_')
+
+
+
