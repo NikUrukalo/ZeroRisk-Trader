@@ -4,6 +4,7 @@
 ######################################
 
 # libraries
+
 import psycopg2, psycopg2.extensions, psycopg2.extras # PostgreSQL database adapter for the Python and extensions
 psycopg2.extensions.register_type(psycopg2.extensions.UNICODE) # a fix for šumniki (č, š, ž) 
 from psycopg2 import IntegrityError
@@ -16,7 +17,8 @@ from models import *
 from typing import List # library for type hints
 
 DB_PORT = os.environ.get('POSTGRES_PORT', 5432) # default PostgreSQL port
-    
+
+
 
 # class definition
 
@@ -369,12 +371,98 @@ class Repo:
 
 
 
-    
+    def update_position(self, portfolio_id: int, asset_symbol: str, quantity: float, trade_type: str) -> bool:
+        """
+        Updates an existing position when the user buys or sells an asset.
+        BUY  -> increase quantity + recalc avg_buy_price
+        SELL -> decrease quantity + delete position if quantity becomes 0
+        """
+
+        try:
+            # get current position
+            self.cur.execute("""
+                SELECT quantity, avg_buy_price
+                FROM position
+                WHERE portfolio_id = %s AND asset_symbol = %s
+            """, (portfolio_id, asset_symbol))
+
+            pos = self.cur.fetchone()
+            if pos is None:
+                print("Position does not exist. Use add_new_position() instead.")
+                return False
+
+            old_quantity = float(pos['quantity'])
+
+            # BUY logic
+            if trade_type == "BUY":
+                new_quantity = old_quantity + quantity
+                new_avg_price = self.calculate_avg_price(portfolio_id, asset_symbol)
+
+                self.cur.execute("""
+                    UPDATE position
+                    SET quantity = %s, avg_buy_price = %s
+                    WHERE portfolio_id = %s AND asset_symbol = %s
+                """, (new_quantity, new_avg_price, portfolio_id, asset_symbol))
+
+                self.conn.commit()
+                print("Position updated (BUY).")
+                return True
+
+            # SELL logic
+            elif trade_type == "SELL":
+                new_quantity = old_quantity - quantity
+
+                if new_quantity < 0:
+                    print("Error: cannot sell more than current quantity.")
+                    return False
+
+                # If user sells everything → delete position
+                if new_quantity == 0:
+                    self.cur.execute("""
+                        DELETE FROM position
+                        WHERE portfolio_id = %s AND asset_symbol = %s
+                    """, (portfolio_id, asset_symbol))
+
+                    self.conn.commit()
+                    print("Position deleted (sold all).")
+                    return True
+
+                # Otherwise update quantity only
+                self.cur.execute("""
+                    UPDATE position
+                    SET quantity = %s
+                    WHERE portfolio_id = %s AND asset_symbol = %s
+                """, (new_quantity, portfolio_id, asset_symbol))
+
+                self.conn.commit()
+                print("Position updated (SELL).")
+                return True
+
+            else:
+                print("trade_type must be BUY or SELL")
+                return False
+
+        except Exception as e:
+            print(f"Error updating position: {e}")
+            return False
 
 
 
 
-    
+
+    def buy_asset():
+        pass
+
+    def sell_asset():
+        pass
+
+    def reward_user(self, user_id: int, amount: int):
+        self.cur.execute("""
+            UPDATE portfolio
+            SET virtual_balance = virtual_balance + %s
+            WHERE user_id = %s
+        """, (amount, user_id))
+        self.conn.commit()
 
 
 
