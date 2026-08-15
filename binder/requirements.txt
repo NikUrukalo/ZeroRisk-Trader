@@ -10,3 +10,4 @@ yf
 pd
 time
 Path
+jupyter-server-proxy
