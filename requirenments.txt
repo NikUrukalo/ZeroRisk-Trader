@@ -6,4 +6,7 @@ dataclasses
 dataclasses_json 
 datetime 
 psycopg2
-datetime
+yf
+pd
+time
+Path

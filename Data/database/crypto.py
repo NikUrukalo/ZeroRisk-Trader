@@ -85,8 +85,8 @@ def download_prices(tickers, batch_size=25, period="1mo", interval="1d", pause=2
         time.sleep(pause)
     return pd.concat(all_frames, ignore_index=True)
 
+# Close price is equal to the actual price.
 df_prices = download_prices(picked_cryptos)
-
 latest_prices = df_prices.sort_values("Date").groupby("Ticker").tail(1)
 
 # Adding crypto name.
@@ -105,9 +105,11 @@ now = datetime.now()
 current_time = now.strftime("%H:%M:%S")
 latest_prices["Time"] = current_time
 
+# Selecting the wanted columns.
 latest_prices = latest_prices[["Name", "Ticker", "Asset_Type", "Price", "Date", "Time"]]
 latest_prices = pd.DataFrame(latest_prices)
 
+# Adding path to the wanted folder and creating csv.
 SCRIPT_DIR = Path(__file__).resolve().parent
 latest_prices.to_csv(SCRIPT_DIR / 'crypto.csv', index=False)
 
