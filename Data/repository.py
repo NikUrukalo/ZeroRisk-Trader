@@ -53,6 +53,7 @@ class Repo:
         row = self.cur.fetchone() # returns a dictionary or None
         return App_User.from_dict(row) if row else None # turns dictionary into python object
 
+
     # portfolio 
 
     def insert_portfolio(self, user_id: int, initial_balance: float) -> int:
@@ -85,21 +86,25 @@ class Repo:
 
         self.conn.commit()
 
+
     # assets 
 
-    def get_all_assets(self) -> List[Asset]:
+    def get_all_assets(self) -> List[Asset]: # a list where every element is an Asset object
         self.cur.execute("""
             SELECT a.asset_id, m.asset_name, a.asset_symbol, m.asset_type,
                    a.price, a.date_stamp, a.time_stamp
             FROM asset a
             JOIN asset_master m ON a.asset_symbol = m.asset_symbol
-            WHERE a.date_stamp = (
-                SELECT DISTINCT MAX(date_stamp)
+            WHERE (a.date_stamp, a.time_stamp) = (
+                SELECT date_stamp, time_stamp
                 FROM asset
+                ORDER BY date_stamp DESC, time_stamp DESC
+                LIMIT 1
             )
         """)
 
-        return [Asset.from_dict(t) for t in self.cur.fetchall()]
+        dictionary = self.cur.fetchall()
+        return [Asset.from_dict(a) for a in dictionary]
 
     def get_latest_price(self, asset_symbol: str) -> Optional[float]:
         self.cur.execute("""
@@ -115,9 +120,8 @@ class Repo:
 
     def get_latest_two_timestamps(self) -> List[dict]:
         """
-        Returns up to 2 most recent (date_stamp, time_stamp) pairs found in
-        the asset table. Might return fewer than 2 rows — the caller decides
-        what that means.
+        Returns 2 most recent (date_stamp, time_stamp) pairs found in
+        the asset table.
         """
         self.cur.execute("""
             SELECT DISTINCT date_stamp, time_stamp
@@ -142,7 +146,8 @@ class Repo:
 
         return [Asset.from_dict(row) for row in self.cur.fetchall()]
 
-    # ---------- trades ----------
+
+    # trades 
 
     def insert_trade(self, portfolio_id: int, asset_symbol: str, quantity: float,
                       price: float, trade_type: str) -> None:
@@ -164,7 +169,16 @@ class Repo:
 
         return [Trade.from_dict(row) for row in self.cur.fetchall()]
 
-    # ---------- positions ----------
+    def delete_all_trades_of_specific_user(self, portfolio_id: int) -> None:
+        self.cur.execute("""
+            DELETE FROM trade
+            WHERE portfolio_id = %s
+        """, (portfolio_id,))
+
+        self.conn.commit()
+
+
+    # positions 
 
     def get_position(self, portfolio_id: int, asset_symbol: str) -> Optional[Position]:
         self.cur.execute("""
