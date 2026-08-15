@@ -3,6 +3,7 @@ import pandas as pd
 import time
 from datetime import datetime
 import psycopg2
+from pathlib import Path
 
 # ===== Hand picked stocks =====
 picked_stocks = [
@@ -182,8 +183,8 @@ def download_prices(tickers, batch_size=25, period="1mo", interval="1d", pause=2
         time.sleep(pause)
     return pd.concat(all_frames, ignore_index=True)
 
+# Close price is equal to the actual price.
 df_prices = download_prices(picked_stocks)
-
 latest_prices = df_prices.sort_values("Date").groupby("Ticker").tail(1)
 
 # Adding Stock name.
@@ -194,23 +195,27 @@ eurusd = yf.download("EURUSD=X", period="1d")["Close"].iloc[-1]
 eurusd = float(eurusd.iloc[-1])
 latest_prices["Price"] = latest_prices["Close"] / eurusd
 
+# Adding asset type.
 latest_prices["Asset_Type"] = "Stock"
 
+# Adding time when prices were taken.
 now = datetime.now()
 current_time =now.strftime("%H:%M:%S")
 latest_prices["Time"] = current_time
 
+# Selecting the wanted columns.
 latest_prices = latest_prices[["Name", "Ticker", "Asset_Type", "Price", "Date",  "Time"]]
-
-
 latest_prices = pd.DataFrame(latest_prices)
-latest_prices.to_csv('stock_prices.csv')
+
+# Adding path to the wanted folder and creating csv.
+SCRIPT_DIR = Path(__file__).resolve().parent
+latest_prices.to_csv(SCRIPT_DIR / 'stocks.csv', index=False)
 
 
-
-conn = psycopg2.connect("host=baza.fmf.uni-lj.si dbname=sem2026_nejczi user=nikuru")
+# Filling the database with data.
+conn = psycopg2.connect(host="baza.fmf.uni-lj.si", dbname="sem2026_nejczi", user="javnost", password="javnogeslo")
 cur = conn.cursor()
-with open('stock_prices.csv', 'r') as f:
+with open('stocks.csv', 'r') as f:
     next(f) # Skip the header row.
     cur.copy_from(f, 'asset', sep=',', columns=('asset_name', 'asset_symbol', 'asset_type', 'price', 'date_stamp', 'time_stamp'))
 
