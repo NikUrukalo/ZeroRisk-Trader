@@ -10,6 +10,12 @@ GRANT SELECT, DELETE, INSERT, UPDATE ON TABLE app_user TO javnost;
 GRANT SELECT, DELETE, INSERT, UPDATE ON TABLE portfolio TO javnost;
 GRANT ALL PRIVILEGES ON SEQUENCE app_user_user_id_seq TO javnost;
 GRANT ALL PRIVILEGES ON SEQUENCE portfolio_portfolio_id_seq TO javnost;
+GRANT SELECT, DELETE, INSERT, UPDATE ON TABLE trade TO javnost;
+GRANT ALL PRIVILEGES ON SEQUENCE  position_position_id_seq TO javnost;
+GRANT SELECT, DELETE, INSERT, UPDATE ON TABLE position TO javnost;
+
+
+
 
 
 /* Table Creation */
@@ -42,7 +48,7 @@ CREATE TABLE IF NOT EXISTS asset (
 CREATE TABLE IF NOT EXISTS trade (
 	trade_id SERIAL PRIMARY KEY,
 	portfolio_id INTEGER NOT NULL REFERENCES portfolio(portfolio_id) ON DELETE CASCADE,
-	asset_id INTEGER NOT NULL REFERENCES asset(asset_id) ON DELETE CASCADE,
+	asset_symbol TEXT NOT NULL REFERENCES asset(asset_symbol) ON DELETE CASCADE,
 	trade_type TEXT NOT NULL CHECK (trade_type in ('BUY', 'SELL')),
 	quantity NUMERIC(10, 4) NOT NULL CHECK (quantity > 0),
 	price NUMERIC(10, 2) NOT NULL,
@@ -52,8 +58,11 @@ CREATE TABLE IF NOT EXISTS trade (
 CREATE TABLE IF NOT EXISTS position (
 	position_id SERIAL PRIMARY KEY,
 	portfolio_id INTEGER NOT NULL REFERENCES portfolio(portfolio_id) ON DELETE CASCADE,
-	asset_id INTEGER NOT NULL REFERENCES asset(asset_id) ON DELETE CASCADE,
+	asset_symbol TEXT NOT NULL REFERENCES asset(asset_symbol) ON DELETE CASCADE,
 	quantity NUMERIC(10, 4) NOT NULL CHECK (quantity > 0),
 	avg_buy_price NUMERIC(10, 2) NOT NULL,
 	UNIQUE (portfolio_id, asset_id) -- so that we have all assets in a portfolio together
 );
+
+SELECT *
+FROM POSITION

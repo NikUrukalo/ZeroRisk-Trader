@@ -15,7 +15,10 @@ for t in assets:
 
 repo.create_account('test_user', 'test_user', 'password')
 
-repo.log_in('test_user', 'password_')
+repo.insert_trade(1, 'AAPL', 2, 'BUY')
+
+repo.add_new_position(1, 'AAPL', 2, 'BUY')
+
 
 
 
