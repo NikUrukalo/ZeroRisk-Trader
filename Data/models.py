@@ -13,7 +13,7 @@ from datetime import datetime
 @dataclass
 class App_User:
     user_id : int = field(default=0)  # for each field we specify the type and default value
-    name : str = field(default='')
+    user_name : str = field(default='')  # matches app_user.user_name in the DB
     email: str = field(default='') 
     password_hash: str = field(default='')
     created_at: datetime = field(default=None) 
@@ -22,6 +22,7 @@ class App_User:
 @dataclass
 class AppUserDto:
     user_id : int = field(default=0) 
+    user_name : str = field(default='')
     email: str = field(default='') 
    
 
@@ -40,8 +41,17 @@ class PortfolioDto:
     portfolio_id: int = field(default=0)
     virtual_balance: float = field(default=0)
 
+@dataclass_json
+@dataclass
+class AssetMaster:
+    asset_symbol: str = field(default='')
+    asset_name: str = field(default='')
+    asset_type: str = field(default='')
 
-### Asset
+# This is the *joined* view (asset_master + asset price snapshot),
+# not a 1:1 mapping to a single table anymore. The repository builds this
+# by joining asset with asset_master. asset_id here is the id of the
+# specific price snapshot row, not the symbol's identity.
 @dataclass_json
 @dataclass
 class Asset:
@@ -56,7 +66,6 @@ class Asset:
 @dataclass_json
 @dataclass
 class AssetDto:
-    asset_id: int = field(default=0)
     asset_name: str = field(default='')
     asset_symbol: str = field(default='')
     asset_type: str = field(default='')
@@ -71,18 +80,17 @@ class AssetDto:
 class Position:
     position_id: int = field(default=0)
     portfolio_id: int = field(default=0)
-    asset_id: int = field(default=0)
+    asset_symbol: str = field(default='')  # matches position.asset_symbol in the DB
     quantity: float = field(default=0.0)
-    average_price: float = field(default=0.0)
-    created_at: datetime = field(default=None)
+    avg_buy_price: float = field(default=0.0)  # matches position.avg_buy_price in the DB
 
 @dataclass_json
 @dataclass
 class PositionDto:
     position_id: int = field(default=0)
-    asset_id: int = field(default=0)
+    asset_symbol: str = field(default='')
     quantity: float = field(default=0.0)
-    average_price: float = field(default=0.0)
+    avg_buy_price: float = field(default=0.0)
 
 
 ### Trade
@@ -91,7 +99,7 @@ class PositionDto:
 class Trade:
     trade_id: int = field(default=0)
     portfolio_id: int = field(default=0)
-    asset_id: int = field(default=0)
+    asset_symbol: str = field(default='')  # matches trade.asset_symbol in the DB
     quantity: float = field(default=0.0)
     price: float = field(default=0.0)
     trade_type: str = field(default='')   # BUY or SELL
@@ -101,9 +109,7 @@ class Trade:
 @dataclass
 class TradeDto:
     trade_id: int = field(default=0)
-    asset_id: int = field(default=0)
+    asset_symbol: str = field(default='')
     quantity: float = field(default=0.0)
     price: float = field(default=0.0)
     trade_type: str = field(default='')
-
-    
