@@ -2,7 +2,7 @@ import yfinance as yf
 import pandas as pd
 import time
 
-def download_prices(tickers, batch_size=25, period="1mo", interval="1d", pause=2):
+def download_assets(tickers, batch_size=25, period="1mo", interval="1d", pause=2):
     all_frames = []
     for i in range(0, len(tickers), batch_size):
         batch = tickers[i:i+batch_size]

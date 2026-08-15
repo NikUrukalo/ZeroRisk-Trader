@@ -1,0 +1,204 @@
+Name,Ticker,Asset_Type
+Commonwealth Bank of Australia,CBA.AX,Stock
+NetEase,NTES,Stock
+Alphabet Class A,GOOGL,Stock
+Starbucks,SBUX,Stock
+ASML Holding,ASML,Stock
+Meta Platforms,META,Stock
+Novo Nordisk,NVO,Stock
+Amazon,AMZN,Stock
+American Tower,AMT,Stock
+Taiwan Semiconductor Manufacturing,TSM,Stock
+Bank of Nova Scotia,BNS,Stock
+Nvidia,NVDA,Stock
+Microsoft,MSFT,Stock
+Alibaba,BABA,Stock
+JD.com,JD,Stock
+Apple,AAPL,Stock
+Baidu,BIDU,Stock
+AstraZeneca,AZN,Stock
+Pinduoduo,PDD,Stock
+BlackRock,BLK,Stock
+Tencent,TCEHY,Stock
+S&P Global,SPGI,Stock
+Tesla,TSLA,Stock
+Unilever,UL,Stock
+Shell,SHEL,Stock
+SAP,SAP,Stock
+Union Pacific,UNP,Stock
+Lowe's,LOW,Stock
+Cisco Systems,CSCO,Stock
+Nestlé,NESN.SW,Stock
+Mastercard,MA,Stock
+Bristol-Myers Squibb,BMY,Stock
+Walmart,WMT,Stock
+Rio Tinto,RIO,Stock
+Sumitomo Mitsui Financial Group,SMFG,Stock
+Visa,V,Stock
+Procter & Gamble,PG,Stock
+Danaher,DHR,Stock
+JPMorgan Chase,JPM,Stock
+HSBC,HSBC,Stock
+Berkshire Hathaway,BRK-B,Stock
+PepsiCo,PEP,Stock
+Costco,COST,Stock
+Nintendo,NTDOY,Stock
+Home Depot,HD,Stock
+BP,BP,Stock
+Coca-Cola,KO,Stock
+Intuit,INTU,Stock
+BHP Group,BHP,Stock
+Abbott Laboratories,ABT,Stock
+Toyota,TM,Stock
+American Express,AXP,Stock
+Eli Lilly,LLY,Stock
+UnitedHealth Group,UNH,Stock
+Johnson & Johnson,JNJ,Stock
+Sony Group,SONY,Stock
+Iberdrola,IBE.MC,Stock
+Bank of America,BAC,Stock
+Morgan Stanley,MS,Stock
+Goldman Sachs,GS,Stock
+Merck,MRK,Stock
+Pfizer,PFE,Stock
+Wells Fargo,WFC,Stock
+Deutsche Telekom,DTE.DE,Stock
+Mitsubishi UFJ Financial Group,MUFG,Stock
+Thermo Fisher Scientific,TMO,Stock
+AbbVie,ABBV,Stock
+Broadcom,AVGO,Stock
+McDonald's,MCD,Stock
+Nike,NKE,Stock
+Royal Bank of Canada,RY,Stock
+General Electric,GE,Stock
+Lockheed Martin,LMT,Stock
+Advanced Micro Devices,AMD,Stock
+RTX Corporation,RTX,Stock
+L'Oréal,OR.PA,Stock
+Salesforce,CRM,Stock
+Netflix,NFLX,Stock
+Deere & Company,DE,Stock
+Toronto-Dominion Bank,TD,Stock
+LVMH,MC.PA,Stock
+Adobe,ADBE,Stock
+AT&T,T,Stock
+Oracle,ORCL,Stock
+Verizon,VZ,Stock
+Linde,LIN,Stock
+Philip Morris International,PM,Stock
+ServiceNow,NOW,Stock
+Siemens,SIE.DE,Stock
+Honeywell,HON,Stock
+TotalEnergies,TTE,Stock
+Disney,DIS,Stock
+Honda,HMC,Stock
+Texas Instruments,TXN,Stock
+Comcast,CMCSA,Stock
+Qualcomm,QCOM,Stock
+Exxon Mobil,XOM,Stock
+UPS,UPS,Stock
+Sanofi,SAN.PA,Stock
+Chevron,CVX,Stock
+Caterpillar,CAT,Stock
+Shopify,SHOP,Stock
+Boeing,BA,Stock
+Allianz,ALV.DE,Stock
+Charles Schwab,SCHW,Stock
+Intel,INTC,Stock
+IBM,IBM,Stock
+Infosys,INFY,Stock
+iShares Select Dividend ETF,DVY,ETF
+iPath Series B S&P 500 VIX Short-Term Futures ETN,VXX,ETF
+iShares MSCI Japan ETF,EWJ,ETF
+Schwab US Dividend Equity ETF,SCHD,ETF
+iShares MSCI EAFE ETF,EFA,ETF
+Vanguard FTSE Emerging Markets ETF,VWO,ETF
+Vanguard FTSE Developed Markets ETF,VEA,ETF
+Real Estate Select Sector SPDR Fund,XLRE,ETF
+Materials Select Sector SPDR Fund,XLB,ETF
+Utilities Select Sector SPDR Fund,XLU,ETF
+Industrial Select Sector SPDR Fund,XLI,ETF
+Consumer Staples Select Sector SPDR Fund,XLP,ETF
+Consumer Discretionary Select Sector SPDR Fund,XLY,ETF
+Health Care Select Sector SPDR Fund,XLV,ETF
+Energy Select Sector SPDR Fund,XLE,ETF
+Financial Select Sector SPDR Fund,XLF,ETF
+Technology Select Sector SPDR Fund,XLK,ETF
+Invesco S&P 500 Equal Weight ETF,RSP,ETF
+iShares Russell 2000 ETF,IWM,ETF
+SPDR Dow Jones Industrial Average ETF,DIA,ETF
+Invesco QQQ Trust,QQQ,ETF
+Vanguard Total Stock Market ETF,VTI,ETF
+iShares Core S&P 500 ETF,IVV,ETF
+Vanguard S&P 500 ETF,VOO,ETF
+SPDR S&P 500 ETF Trust,SPY,ETF
+iShares MSCI Emerging Markets ETF,EEM,ETF
+Vanguard Dividend Appreciation ETF,VIG,ETF
+iShares Core MSCI EAFE ETF,IEFA,ETF
+Vanguard FTSE Europe ETF,VGK,ETF
+Vanguard High Dividend Yield ETF,VYM,ETF
+First Trust Cloud Computing ETF,SKYY,ETF
+ROBO Global Robotics and Automation ETF,ROBO,ETF
+iShares Global Clean Energy ETF,ICLN,ETF
+VanEck Semiconductor ETF,SMH,ETF
+iShares Semiconductor ETF,SOXX,ETF
+ARK Innovation ETF,ARKK,ETF
+Invesco DB Commodity Index Tracking Fund,DBC,ETF
+United States Oil Fund,USO,ETF
+iShares Silver Trust,SLV,ETF
+SPDR Gold Shares,GLD,ETF
+iShares TIPS Bond ETF,TIP,ETF
+iShares iBoxx High Yield Corporate Bond ETF,HYG,ETF
+iShares iBoxx Investment Grade Corporate Bond ETF,LQD,ETF
+iShares 1-3 Year Treasury Bond ETF,SHY,ETF
+iShares 7-10 Year Treasury Bond ETF,IEF,ETF
+iShares 20+ Year Treasury Bond ETF,TLT,ETF
+Vanguard Total Bond Market ETF,BND,ETF
+iShares Core U.S. Aggregate Bond ETF,AGG,ETF
+iShares MSCI China ETF,MCHI,ETF
+iShares China Large-Cap ETF,FXI,ETF
+iShares Core MSCI Emerging Markets ETF,IEMG,ETF
+Vanguard Real Estate ETF,VNQ,ETF
+Hedera,HBAR-USD,Crypto
+Arbitrum,ARB-USD,Crypto
+Stellar,XLM-USD,Crypto
+Internet Computer,ICP-USD,Crypto
+Bitcoin Cash,BCH-USD,Crypto
+Ethereum Classic,ETC-USD,Crypto
+Cosmos,ATOM-USD,Crypto
+NEAR Protocol,NEAR-USD,Crypto
+Zcash,ZEC-USD,Crypto
+Filecoin,FIL-USD,Crypto
+Algorand,ALGO-USD,Crypto
+Litecoin,LTC-USD,Crypto
+BNB,BNB-USD,Crypto
+MultiversX,EGLD-USD,Crypto
+Tether,USDT-USD,Crypto
+Solana,SOL-USD,Crypto
+Theta Network,THETA-USD,Crypto
+XRP,XRP-USD,Crypto
+Tezos,XTZ-USD,Crypto
+Chiliz,CHZ-USD,Crypto
+USD Coin,USDC-USD,Crypto
+EOS,EOS-USD,Crypto
+Cardano,ADA-USD,Crypto
+Axie Infinity,AXS-USD,Crypto
+Dogecoin,DOGE-USD,Crypto
+Ethereum,ETH-USD,Crypto
+Decentraland,MANA-USD,Crypto
+Avalanche,AVAX-USD,Crypto
+The Sandbox,SAND-USD,Crypto
+TRON,TRX-USD,Crypto
+Quant,QNT-USD,Crypto
+Kava,KAVA-USD,Crypto
+Polkadot,DOT-USD,Crypto
+THORChain,RUNE-USD,Crypto
+Chainlink,LINK-USD,Crypto
+Aave,AAVE-USD,Crypto
+Toncoin,TON-USD,Crypto
+Bitcoin,BTC-USD,Crypto
+Maker,MKR-USD,Crypto
+Shiba Inu,SHIB-USD,Crypto
+VeChain,VET-USD,Crypto
+Optimism,OP-USD,Crypto
+Synthetix,SNX-USD,Crypto

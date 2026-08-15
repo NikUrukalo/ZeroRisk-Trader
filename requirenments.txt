@@ -1,6 +1,13 @@
 requests
 pandas
-psycopg2-binary
-dataclasses-json
-yfinance
+os
+shutil
+dataclasses
+dataclasses_json 
+datetime 
+psycopg2
+yf
+pd
+time
+Path
 bcrypt
