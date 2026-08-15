@@ -4,19 +4,6 @@ GRANT ALL ON DATABASE sem2026_nejczi TO nikuru WITH GRANT OPTION;
 GRANT CONNECT ON DATABASE sem2026_nejczi TO nikuru;
 GRANT CONNECT ON DATABASE sem2026_nejczi TO javnost;
 
-GRANT SELECT ON TABLE asset TO javnost;
-GRANT SELECT, DELETE, INSERT, UPDATE ON TABLE asset TO nikuru;
-GRANT SELECT, DELETE, INSERT, UPDATE ON TABLE app_user TO javnost;
-GRANT SELECT, DELETE, INSERT, UPDATE ON TABLE portfolio TO javnost;
-GRANT ALL PRIVILEGES ON SEQUENCE app_user_user_id_seq TO javnost;
-GRANT ALL PRIVILEGES ON SEQUENCE portfolio_portfolio_id_seq TO javnost;
-GRANT SELECT, DELETE, INSERT, UPDATE ON TABLE trade TO javnost;
-GRANT ALL PRIVILEGES ON SEQUENCE  position_position_id_seq TO javnost;
-GRANT SELECT, DELETE, INSERT, UPDATE ON TABLE position TO javnost;
-
-
-
-
 
 /* Table Creation */
 
