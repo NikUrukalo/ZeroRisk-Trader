@@ -62,10 +62,10 @@ GRANT ALL PRIVILEGES ON SEQUENCE app_user_user_id_seq TO javnost;
 GRANT SELECT, DELETE, INSERT, UPDATE ON TABLE portfolio TO javnost;
 GRANT ALL PRIVILEGES ON SEQUENCE portfolio_portfolio_id_seq TO javnost;
 
-GRANT SELECT ON TABLE asset_master TO javnost;
+GRANT SELECT, INSERT ON TABLE asset_master TO javnost;
 GRANT SELECT, DELETE, INSERT, UPDATE ON TABLE asset_master TO nikuru;
 
-GRANT SELECT ON TABLE asset TO javnost;
+GRANT SELECT, INSERT ON TABLE asset TO javnost;
 GRANT SELECT, DELETE, INSERT, UPDATE ON TABLE asset TO nikuru;
 GRANT ALL PRIVILEGES ON SEQUENCE asset_asset_id_seq TO nikuru;
 
@@ -74,3 +74,6 @@ GRANT ALL PRIVILEGES ON SEQUENCE trade_trade_id_seq TO javnost;
 
 GRANT SELECT, DELETE, INSERT, UPDATE ON TABLE position TO javnost;
 GRANT ALL PRIVILEGES ON SEQUENCE position_position_id_seq TO javnost;
+
+GRANT ALL PRIVILEGES ON SEQUENCE asset_asset_id_seq TO javnost;
+
