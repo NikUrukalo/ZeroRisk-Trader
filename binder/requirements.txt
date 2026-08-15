@@ -1,0 +1,13 @@
+requests
+pandas
+os
+shutil
+dataclasses
+dataclasses_json 
+datetime 
+psycopg2
+yf
+pd
+time
+Path
+jupyter-server-proxy
