@@ -53,7 +53,4 @@ CREATE TABLE IF NOT EXISTS position (
 	UNIQUE (portfolio_id, asset_id) -- so that we have all assets in a portfolio together
 );
 
-INSERT INTO asset (asset_name, asset_symbol, asset_type, price, date_stamp, time_stamp)
-VALUES ('test_etf', 'TEST4', 'ETF', 424.2, '2026-08-12', '21:49:20');
 
-select * from asset
