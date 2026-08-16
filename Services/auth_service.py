@@ -1,6 +1,8 @@
 from Data.repository import Repo
 from Data.models import *
 import bcrypt
+from datetime import date
+from typing import Optional
 
 
 class AuthService:
@@ -11,15 +13,36 @@ class AuthService:
     def insert_user(self, user_name: str, email: str, password: str) -> AppUserDto:
 
         # Encoding the password.
-        bytes = password.encode('utf-8')
+        bytes_pw = password.encode('utf-8')
         salt = bcrypt.gensalt()
-        
-        #hashing the password
-        password_hash = bcrypt.hashpw(bytes, salt)
+    
+        # Hashing the password, then decode back to str for DB storage.
+        password_hash = bcrypt.hashpw(bytes_pw, salt).decode('utf-8')
 
         # Creating user and adding it to the database.
         user_id = self.repo.insert_user(user_name, email, password_hash)
         return AppUserDto(user_id=user_id, user_name=user_name, email=email)
 
 
-test = AuthService().insert_user('testuser324', 'testuser324@gmail.com', 'mucki123')
+    
+    def get_user_by_username(self, user_name: str) -> Optional[App_User]:
+        return self.repo.get_user_by_username(user_name)
+        
+
+
+    def login_user(self, app_user: str, password: str) -> AppUserDto | bool:
+        user = self.repo.get_user_by_username(app_user)
+
+        if user is None:
+            return False
+
+        password_bytes = password.encode('utf-8')
+        succ = bcrypt.checkpw(password_bytes, user.password_hash.encode('utf-8'))
+
+        if succ:
+            return AppUserDto(user_id=user.user_id, user_name=user.user_name, email=user.email)
+
+        return False 
+
+
+    
