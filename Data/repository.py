@@ -77,6 +77,16 @@ class Repo:
         dictionary = self.cur.fetchone()
         return dictionary['virtual_balance']
 
+    def get_portfolio_id(self, user_id: int) -> Optional[int]:
+        self.cur.execute('''
+            SELECT portfolio_id
+            FROM portfolio
+            WHERE user_id = %s
+        ''', (user_id,))
+
+        dictionary = self.cur.fetchone()
+        return dictionary['portfolio_id'] if dictionary else None
+
     def update_balance(self, user_id: int, delta: float) -> None:
         self.cur.execute("""
             UPDATE portfolio
@@ -177,6 +187,21 @@ class Repo:
 
         self.conn.commit()
 
+    def get_trades(self, portfolio_id: int, asset_symbol: str) -> List[Trade]:
+        """
+        All trades (BUY and SELL) for this asset, oldest first. Used to
+        figure out when a position was last fully closed and reopened.
+        """
+        self.cur.execute("""
+            SELECT trade_id, portfolio_id, asset_symbol, quantity, price, trade_type, created_at
+            FROM trade
+            WHERE portfolio_id = %s
+            AND asset_symbol = %s
+            ORDER BY created_at ASC
+        """, (portfolio_id, asset_symbol))
+ 
+        return [Trade.from_dict(row) for row in self.cur.fetchall()]
+
 
     # positions 
 
@@ -189,6 +214,16 @@ class Repo:
 
         row = self.cur.fetchone()
         return Position.from_dict(row) if row else None
+
+    def get_positions(self, portfolio_id: int) -> List[Position]:
+        self.cur.execute("""
+            SELECT position_id, portfolio_id, asset_symbol, quantity, avg_buy_price
+            FROM position
+            WHERE portfolio_id = %s 
+        """, (portfolio_id,))
+
+        rows = self.cur.fetchall()
+        return [Position.from_dict(row) for row in rows]
 
     def insert_position(self, portfolio_id: int, asset_symbol: str,
                          quantity: float, avg_buy_price: float) -> None:
