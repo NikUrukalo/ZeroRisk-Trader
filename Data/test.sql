@@ -1,2 +1,1 @@
-SELECT *
-FROM app_user
+DELETE FROM app_user WHERE user_name = 'testuser324'
