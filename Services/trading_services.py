@@ -155,14 +155,29 @@ class TradingService:
         total_value = balance + holdings_value
 
         portfolio_id = self.repo.get_portfolio_id(user_id)
-        trades = self.repo.get_all_trades(portfolio_id)
+        raw_trades = self.repo.get_all_trades(portfolio_id)[:10]
+
+        # Dictionary mapping symbols to asset names for quick lookup
+        assets = {a.asset_symbol: a.asset_name for a in self.repo.get_all_assets()}
+
+        # Trade processing for HTML display.
+        formatted_trades = []
+        for t in raw_trades:
+            formatted_trades.append({
+                "asset_symbol": t.asset_symbol,
+                "asset_name": assets.get(t.asset_symbol, t.asset_symbol),
+                "trade_type": t.trade_type,
+                "quantity": t.quantity,
+                "price": float(t.price),
+                "created_at": t.created_at.strftime("%Y-%m-%d %H:%M") if hasattr(t.created_at, "strftime") else str(t.created_at)[:16]
+            })
 
         return {
             "balance": float(balance),
             "positions": positions,
             "holdings_value": float(holdings_value),
             "total_value": float(total_value),
-            "trades": trades[:10],
+            "trades": formatted_trades,
         }
 
     def get_top_5_movers(self) -> List[dict]:
