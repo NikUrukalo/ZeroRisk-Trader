@@ -6,7 +6,7 @@
 /* Was referenced in base.html but never defined - this is why the navbar
    had no background color and blended into the page. */
 .bg-navy {
-    background-color: #0f172a;
+    background-color: #011951;
 }
 
 .navbar.bg-navy .nav-link {
@@ -52,3 +52,16 @@
     font-size: 1.1rem;
     font-weight: 700;
 }
+
+.btn-primary {
+    background-color: #0A2F7A;   /* lighter navy */
+    border-color: #0A2F7A;
+    font-weight: 600;
+    color: #fff;
+}
+
+.btn-primary:hover {
+    background-color: #0D3A94;  /* slightly brighter hover */
+    border-color: #0D3A94;
+}
+
