@@ -47,4 +47,13 @@ class AuthService:
         return False 
 
 
+    def logout_user(self, username: str) -> None:
+        """
+        Handles any server-side cleanup needed during logout 
+        (e.g., invalidating tokens, clearing active sessions).
+        """
+        # If storing sessions in DB or memory, remove/invalidate here:
+        # self.repo.delete_session(username)
+        pass
+
     

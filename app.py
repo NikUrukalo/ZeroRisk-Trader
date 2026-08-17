@@ -220,5 +220,12 @@ def add_balance_post():
         )
 
 
+@app.route('/logout')
+def logout():
+    # Remove the user cookie by setting its value to empty / expiring it
+    response.set_cookie("user", "", expires=0)
+    redirect('/login')
+
+
 if __name__ == '__main__':
     run(app, host='localhost', port=8080, debug=True, reloader=True)
