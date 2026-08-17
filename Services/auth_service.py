@@ -19,8 +19,10 @@ class AuthService:
         # Hashing the password, then decode back to str for DB storage.
         password_hash = bcrypt.hashpw(bytes_pw, salt).decode('utf-8')
 
-        # Creating user and adding it to the database.
+        # Creating user and adding it to app_user and portfolio tables
         user_id = self.repo.insert_user(user_name, email, password_hash)
+        self.repo.insert_portfolio(user_id, 0)
+
         return AppUserDto(user_id=user_id, user_name=user_name, email=email)
 
 

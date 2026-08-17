@@ -36,16 +36,16 @@ def login_get():
 @app.post('/login')
 def login_post():
     """
-    Prijavi uporabnika v aplikacijo. Če je prijava uspešna, ustvari piškotke o uporabniku.
-    Drugače sporoči, da je prijava neuspešna.
+    Sign in user.
     """
     username = request.forms.get('username')
     password = request.forms.get('password')
 
-    prijava = auth.login_user(username, password)
+    log_in = auth.login_user(username, password)
 
-    if prijava:
+    if log_in:
         response.set_cookie("user", username)
+        response.set_cookie("user_id", str(log_in.user_id))
         return redirect(url('login'))
     else:
         return template('login', user=None, success=None, error="Unsuccessful login. Wrong username or password.")

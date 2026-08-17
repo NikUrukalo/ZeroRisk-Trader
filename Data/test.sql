@@ -1,1 +1,2 @@
-DELETE FROM app_user WHERE user_name = 'testuser324'
+SELECT *
+FROM app_user
