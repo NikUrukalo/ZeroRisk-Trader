@@ -151,3 +151,26 @@ class TradingService:
         total_cost = sum(t.quantity * t.price for t in current_streak_buys)
  
         return total_cost / total_quantity
+
+
+    def get_overview(self, user_id: int) -> dict:
+        """
+        Gathers everything needed for the user's overview page in one call:
+        cash balance, current positions, total portfolio
+        value and the 10 most recent trades. 
+        """
+        balance = self.get_balance(user_id)
+        positions = self.get_positions(user_id)
+        holdings_value = sum(p["current_value"] for p in positions)
+        total_value = balance + holdings_value
+
+        portfolio_id = self.repo.get_portfolio_id(user_id)
+        trades = self.repo.get_all_trades(portfolio_id)
+
+        return {
+            "balance": balance,
+            "positions": positions,
+            "holdings_value": holdings_value,
+            "total_value": total_value,
+            "trades": trades[:10],  # zadnjih 10, da stran ni predolga
+        }

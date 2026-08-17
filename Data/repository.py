@@ -203,6 +203,21 @@ class Repo:
         return [Trade.from_dict(row) for row in self.cur.fetchall()]
 
 
+    def get_all_trades(self, portfolio_id: int) -> List[Trade]:
+        """
+                All trades (BUY and SELL) of this user newest first.
+                Used to see history.
+        """
+        self.cur.execute("""
+            SELECT trade_id, portfolio_id, asset_symbol, quantity, price, trade_type, created_at
+            FROM trade
+            WHERE portfolio_id = %s
+            ORDER BY created_at DESC
+        """, (portfolio_id,))
+        
+        return [Trade.from_dict(row) for row in self.cur.fetchall()]
+
+
     # positions 
 
     def get_position(self, portfolio_id: int, asset_symbol: str) -> Optional[Position]:
