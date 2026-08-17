@@ -5,8 +5,8 @@
 
 /* Was referenced in base.html but never defined - this is why the navbar
    had no background color and blended into the page. */
-.bg-navy {
-    background-color: #011951;
+.navigation-navy {
+    background-color: #001e63;
 }
 
 .navbar.bg-navy .nav-link {
