@@ -77,6 +77,148 @@ def overview():
     return template('overview', user=username, success=None, error=None, **data)
 
 
+@app.route('/trade')
+@cookie_required
+def trade():
+    username = request.get_cookie("user")
+    user = auth.get_user_by_username(username)
+
+    assets = trading_service.get_all_assets()
+    top_movers = trading_service.get_top_5_movers()
+
+    return template(
+        'trade',
+        user=username,
+        assets=assets,
+        top_movers=top_movers,
+        error=None,
+        success=None
+    )
+
+
+@app.post('/trade/buy')
+@cookie_required
+def trade_buy():
+    username = request.get_cookie("user")
+    user = auth.get_user_by_username(username)
+
+    asset_symbol = request.forms.get('asset_symbol')
+    quantity = float(request.forms.get('quantity'))
+
+    try:
+        trading_service.buy_asset(
+            user.user_id,
+            asset_symbol,
+            quantity
+        )
+
+        return redirect('/trade')
+
+    except ValueError as e:
+        assets = trading_service.get_all_assets()
+        top_movers = trading_service.get_top_5_movers()
+
+        return template(
+            'trade',
+            user=username,
+            assets=assets,
+            top_movers=top_movers,
+            error=str(e),
+            success=None
+        )
+
+
+@app.post('/trade/sell')
+@cookie_required
+def trade_sell():
+    username = request.get_cookie("user")
+    user = auth.get_user_by_username(username)
+
+    asset_symbol = request.forms.get('asset_symbol')
+    quantity = float(request.forms.get('quantity'))
+
+    try:
+        trading_service.sell_asset(
+            user.user_id,
+            asset_symbol,
+            quantity
+        )
+
+        return redirect('/trade')
+
+    except ValueError as e:
+        assets = trading_service.get_all_assets()
+        top_movers = trading_service.get_top_5_movers()
+
+        return template(
+            'trade',
+            user=username,
+            assets=assets,
+            top_movers=top_movers,
+            error=str(e),
+            success=None
+        )
+
+
+@app.route('/add_balance')
+@cookie_required
+def add_balance_get():
+
+    username = request.get_cookie("user")
+    user = auth.get_user_by_username(username)
+
+    balance = trading_service.get_balance(user.user_id)
+
+    return template(
+        'add_balance',
+        user=username,
+        balance=balance,
+        error=None,
+        success=None
+    )
+
+
+@app.post('/add_balance')
+@cookie_required
+def add_balance_post():
+
+    username = request.get_cookie("user")
+    user = auth.get_user_by_username(username)
+
+    try:
+        amount = float(request.forms.get('amount'))
+
+        trading_service.add_balance(
+            user.user_id,
+            amount
+        )
+
+        balance = trading_service.get_balance(
+            user.user_id
+        )
+
+        return template(
+            'add_balance',
+            user=username,
+            balance=balance,
+            error=None,
+            success=f"Successfully added €{amount:.2f} to your balance."
+        )
+
+    except ValueError as e:
+
+        balance = trading_service.get_balance(
+            user.user_id
+        )
+
+        return template(
+            'add_balance',
+            user=username,
+            balance=balance,
+            error=str(e),
+            success=None
+        )
+
 
 if __name__ == '__main__':
     run(app, host='localhost', port=8080, debug=True, reloader=True)

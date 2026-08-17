@@ -1,0 +1,322 @@
+% rebase('base.html')
+
+<div class="container mt-4">
+
+    <h2 class="mb-4">Trade</h2>
+
+
+    <!-- Error message -->
+
+    % if error:
+        <div class="alert alert-danger">
+            {{error}}
+        </div>
+    % end
+
+
+    <!-- Search -->
+
+    <div class="mb-3">
+
+        <label for="assetSearch" class="form-label">
+            Search asset
+        </label>
+
+        <input
+            type="text"
+            id="assetSearch"
+            class="form-control"
+            placeholder="Search by name or symbol..."
+        >
+
+    </div>
+
+
+    <!-- Assets -->
+
+    <div class="card mb-5">
+
+        <div class="card-header">
+            <h4 class="mb-0">Assets</h4>
+        </div>
+
+
+        <div class="card-body p-0">
+
+            <div
+                style="
+                    max-height: 500px;
+                    overflow-y: auto;
+                "
+            >
+
+                <table
+                    class="table table-hover mb-0"
+                    id="assetsTable"
+                >
+
+                    <thead class="table-light sticky-top">
+
+                        <tr>
+
+                            <th>Asset</th>
+
+                            <th>Symbol</th>
+
+                            <th>Type</th>
+
+                            <th>Price</th>
+
+                            <th>Trade</th>
+
+                        </tr>
+
+                    </thead>
+
+
+                    <tbody>
+
+                        % for asset in assets:
+
+                        <tr>
+
+                            <td class="asset-name">
+                                {{asset.asset_name}}
+                            </td>
+
+                            <td class="asset-symbol">
+                                {{asset.asset_symbol}}
+                            </td>
+
+                            <td>
+                                {{asset.asset_type}}
+                            </td>
+
+                            <td>
+                                {{asset.price}}
+                            </td>
+
+
+                            <td>
+
+                                <div class="d-flex gap-2">
+
+                                    <!-- BUY -->
+
+                                    <form
+                                        action="/trade/buy"
+                                        method="POST"
+                                        class="d-flex gap-1"
+                                    >
+
+                                        <input
+                                            type="hidden"
+                                            name="asset_symbol"
+                                            value="{{asset.asset_symbol}}"
+                                        >
+
+                                        <input
+                                            type="number"
+                                            name="quantity"
+                                            min="0.000001"
+                                            step="any"
+                                            placeholder="Quantity"
+                                            class="form-control"
+                                            style="width: 110px;"
+                                            required
+                                        >
+
+                                        <button
+                                            type="submit"
+                                            class="btn btn-success"
+                                        >
+                                            Buy
+                                        </button>
+
+                                    </form>
+
+
+                                    <!-- SELL -->
+
+                                    <form
+                                        action="/trade/sell"
+                                        method="POST"
+                                        class="d-flex gap-1"
+                                    >
+
+                                        <input
+                                            type="hidden"
+                                            name="asset_symbol"
+                                            value="{{asset.asset_symbol}}"
+                                        >
+
+                                        <input
+                                            type="number"
+                                            name="quantity"
+                                            min="0.000001"
+                                            step="any"
+                                            placeholder="Quantity"
+                                            class="form-control"
+                                            style="width: 110px;"
+                                            required
+                                        >
+
+                                        <button
+                                            type="submit"
+                                            class="btn btn-danger"
+                                        >
+                                            Sell
+                                        </button>
+
+                                    </form>
+
+                                </div>
+
+                            </td>
+
+                        </tr>
+
+                        % end
+
+                    </tbody>
+
+                </table>
+
+            </div>
+
+        </div>
+
+    </div>
+
+
+    <!-- TOP 5 MOVERS -->
+
+    <div class="card mb-5">
+
+        <div class="card-header">
+            <h4 class="mb-0">Top 5 Movers</h4>
+        </div>
+
+        <div class="card-body">
+
+            <table class="table table-hover">
+
+                <thead>
+
+                    <tr>
+
+                        <th>Asset</th>
+
+                        <th>Symbol</th>
+
+                        <th>Current Price</th>
+
+                        <th>Previous Price</th>
+
+                        <th>Movement</th>
+
+                    </tr>
+
+                </thead>
+
+
+                <tbody>
+
+                    % for mover in top_movers:
+
+                    <tr>
+
+                        <td>
+                            {{mover["asset_name"]}}
+                        </td>
+
+                        <td>
+                            {{mover["asset_symbol"]}}
+                        </td>
+
+                        <td>
+                            {{mover["price"]}}
+                        </td>
+
+                        <td>
+                            {{mover["previous_price"]}}
+                        </td>
+
+                        <td>
+
+                            % if mover["movement"] >= 0:
+
+                                <span class="text-success">
+                                    +{{"%.2f" % mover["movement"]}}%
+                                </span>
+
+                            % else:
+
+                                <span class="text-danger">
+                                    {{"%.2f" % mover["movement"]}}%
+                                </span>
+
+                            % end
+
+                        </td>
+
+                    </tr>
+
+                    % end
+
+                </tbody>
+
+            </table>
+
+        </div>
+
+    </div>
+
+</div>
+
+
+<!-- SEARCH SCRIPT -->
+
+<script>
+
+document
+    .getElementById("assetSearch")
+    .addEventListener("keyup", function() {
+
+        const search = this.value.toLowerCase();
+
+        const rows = document.querySelectorAll(
+            "#assetsTable tbody tr"
+        );
+
+        rows.forEach(function(row) {
+
+            const name = row
+                .querySelector(".asset-name")
+                .textContent
+                .toLowerCase();
+
+            const symbol = row
+                .querySelector(".asset-symbol")
+                .textContent
+                .toLowerCase();
+
+
+            if (
+                name.includes(search) ||
+                symbol.includes(search)
+            ) {
+
+                row.style.display = "";
+
+            } else {
+
+                row.style.display = "none";
+
+            }
+
+        });
+
+    });
+
+</script>
