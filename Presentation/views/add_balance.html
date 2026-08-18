@@ -1,94 +1,102 @@
 % rebase('base.html')
 
-<div class="container mt-4">
-
+<div class="container py-3">
     <div class="row justify-content-center">
-
-        <div class="col-md-6">
-
-            <div class="card">
-
-                <div class="card-header">
-                    <h3 class="mb-0">Earn Balance — Trivia</h3>
+        <div class="col-12 col-md-8 col-lg-5">
+            
+            <div class="card trivia-card">
+                
+                <!-- Compact Header -->
+                <div class="card-header trivia-header">
+                    <div class="d-flex align-items-center justify-content-between">
+                        <h5 class="mb-0 fw-bold">Earn Balance</h5>
+                        <span class="badge trivia-badge">Trivia</span>
+                    </div>
                 </div>
 
-                <div class="card-body">
+                <!-- Compact Body -->
+                <div class="card-body p-3">
 
+                    <!-- Alerts -->
                     % if error:
-                        <div class="alert alert-danger">
-                            {{error}}
+                        <div class="alert alert-danger py-2 px-3 mb-2" role="alert">
+                            <div>{{error}}</div>
                         </div>
                     % end
 
                     % if success:
-                        <div class="alert alert-success">
-                            {{success}}
+                        <div class="alert alert-success py-2 px-3 mb-2" role="alert">
+                            <div>{{success}}</div>
                         </div>
                     % end
 
-
-                    <div class="mb-4">
-                        <h5>Current Balance</h5>
-                        <h2>
+                    <!-- Balance Header Bar -->
+                    <div class="balance-box mb-3">
+                        <span class="balance-label">Current Balance</span>
+                        <h3 class="balance-amount">
                             €{{"%.2f" % balance}}
-                        </h2>
+                        </h3>
                     </div>
 
-
+                    <!-- Trivia Question Form -->
                     % if question:
 
-                        <p class="text-muted">
-                            Answer correctly to earn €{{"%.2f" % question['reward_amount']}}
-                        </p>
+                        <div class="d-flex align-items-center justify-content-between mb-2">
+                            <span class="reward-badge">
+                                Reward: +€{{"%.2f" % question['reward_amount']}}
+                            </span>
+                        </div>
 
                         <form action="/trivia/answer" method="POST">
-
                             <input type="hidden" name="question_id" value="{{question['question_id']}}">
 
-                            <div class="mb-3">
-                                <h5>{{question['question_text']}}</h5>
+                            <div class="mb-2">
+                                <p class="question-text mb-0">
+                                    {{question['question_text']}}
+                                </p>
                             </div>
 
-                            <div class="mb-3">
-
+                            <!-- Options List -->
+                            <div class="d-grid gap-2 mb-3">
                                 % for opt in ['a', 'b', 'c', 'd']:
-                                    <div class="form-check">
-                                        <input
-                                            class="form-check-input"
-                                            type="radio"
-                                            name="submitted_option"
-                                            id="option_{{opt}}"
-                                            value="{{opt.upper()}}"
+                                    <div class="position-relative">
+                                        <input 
+                                            type="radio" 
+                                            class="btn-check" 
+                                            name="submitted_option" 
+                                            id="option_{{opt}}" 
+                                            value="{{opt.upper()}}" 
+                                            autocomplete="off" 
                                             required
                                         >
-                                        <label class="form-check-label" for="option_{{opt}}">
-                                            {{question['option_' + opt]}}
+                                        <label class="btn option-label" for="option_{{opt}}">
+                                            <span class="option-prefix">{{opt}}</span>
+                                            <span>{{question['option_' + opt]}}</span>
                                         </label>
                                     </div>
                                 % end
-
                             </div>
 
-                            <button type="submit" class="btn btn-primary w-100">
+                            <button type="submit" class="btn btn-primary submit-btn">
                                 Submit Answer
                             </button>
-
                         </form>
 
+                    <!-- Cooldown State -->
                     % elif cooldown_remaining:
 
-                        <div class="alert alert-info">
-                            You can try another question in {{cooldown_remaining}} second(s).
+                        <div class="cooldown-box">
+                            <h6 class="fw-bold mb-1">Cooldown Active</h6>
+                            <p class="mb-0 text-muted small">
+                                You can try another question in <span class="fw-bold text-dark">{{cooldown_remaining}} minutes</span>.
+                            </p>
                         </div>
 
                     % end
 
                 </div>
-
             </div>
 
         </div>
-
     </div>
-
 </div>

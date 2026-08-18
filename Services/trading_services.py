@@ -234,7 +234,7 @@ class TradingService:
 
         remaining = self._trivia_cooldown_remaining(portfolio_id)
         if remaining is not None:
-            raise ValueError(f"Trivia is on cooldown for {remaining} more second(s).")
+            raise ValueError(f"Trivia is on cooldown for {remaining} more minutes.")
 
         question = self.repo.get_random_trivia_question()
         if question is None:
@@ -259,7 +259,7 @@ class TradingService:
 
         remaining = self._trivia_cooldown_remaining(portfolio_id)
         if remaining is not None:
-            raise ValueError(f"Trivia is on cooldown for {remaining} more second(s).")
+            raise ValueError(f"Trivia is on cooldown for {remaining} more minutes.")
 
         question = self.repo.get_trivia_question_by_id(question_id)
         if question is None:
@@ -295,7 +295,7 @@ class TradingService:
         if elapsed >= cooldown:
             return None
 
-        return int((cooldown - elapsed).total_seconds())
+        return int((cooldown - elapsed).total_seconds() / 60)
 
     def get_trivia_cooldown_remaining(self, user_id):
         portfolio_id = self.repo.get_portfolio_id(user_id)
