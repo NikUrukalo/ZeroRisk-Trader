@@ -100,3 +100,5 @@ GRANT ALL PRIVILEGES ON SEQUENCE trivia_question_question_id_seq TO javnost;
 GRANT SELECT, DELETE, INSERT, UPDATE ON TABLE trivia_attempt TO javnost;
 GRANT ALL PRIVILEGES ON SEQUENCE trivia_attempt_attempt_id_seq TO javnost;
 
+select * from asset
+
