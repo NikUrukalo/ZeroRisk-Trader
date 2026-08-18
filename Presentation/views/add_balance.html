@@ -1,48 +1,45 @@
 % rebase('base.html')
 
-<div class="container py-3">
+<div class="container py-4">
     <div class="row justify-content-center">
-        <div class="col-12 col-md-8 col-lg-5">
+        <div class="col-12 col-md-10 col-lg-7">
             
-            <div class="card trivia-card">
+            <div class="card border-0 shadow-sm rounded-4 overflow-hidden">
                 
-                <!-- Compact Header -->
-                <div class="card-header trivia-header">
-                    <div class="d-flex align-items-center justify-content-between">
-                        <h5 class="mb-0 fw-bold">Earn Balance</h5>
-                        <span class="badge trivia-badge">Trivia</span>
-                    </div>
+                <!-- Card Header -->
+                <div class="card-header bg-white border-bottom p-3 d-flex align-items-center justify-content-between">
+                    <h5 class="mb-0 fw-bold text-dark">Earn Balance</h5>
+                    <span class="badge bg-primary-subtle text-primary rounded-pill px-3 py-1">Trivia</span>
                 </div>
 
-                <!-- Compact Body -->
-                <div class="card-body p-3">
+                <!-- Card Body -->
+                <div class="card-body p-4">
 
                     <!-- Alerts -->
                     % if error:
-                        <div class="alert alert-danger py-2 px-3 mb-2" role="alert">
+                        <div class="alert alert-danger border-0 rounded-3 py-2 px-3 mb-3 d-flex align-items-center" role="alert">
                             <div>{{error}}</div>
                         </div>
                     % end
 
                     % if success:
-                        <div class="alert alert-success py-2 px-3 mb-2" role="alert">
+                        <div class="alert alert-success border-0 rounded-3 py-2 px-3 mb-3 d-flex align-items-center" role="alert">
                             <div>{{success}}</div>
                         </div>
                     % end
 
-                    <!-- Balance Header Bar -->
-                    <div class="balance-box mb-3">
-                        <span class="balance-label">Current Balance</span>
-                        <h3 class="balance-amount">
+                    <!-- Balance Banner -->
+                    <div class="bg-light rounded-4 p-3 mb-4 text-center border">
+                        <span class="text-muted small fw-medium text-uppercase tracking-wider">Current Balance</span>
+                        <h2 class="fw-bold mb-0 text-dark mt-1">
                             €{{"%.2f" % balance}}
-                        </h3>
+                        </h2>
                     </div>
 
-                    <!-- Trivia Question Form -->
+                    <!-- Question Content -->
                     % if question:
-
-                        <div class="d-flex align-items-center justify-content-between mb-2">
-                            <span class="reward-badge">
+                        <div class="d-flex align-items-center justify-content-between mb-3">
+                            <span class="badge bg-success-subtle text-success rounded-pill px-3 py-2 fw-semibold">
                                 Reward: +€{{"%.2f" % question['reward_amount']}}
                             </span>
                         </div>
@@ -50,14 +47,14 @@
                         <form action="/trivia/answer" method="POST">
                             <input type="hidden" name="question_id" value="{{question['question_id']}}">
 
-                            <div class="mb-2">
-                                <p class="question-text mb-0">
+                            <div class="mb-3">
+                                <p class="fw-medium text-dark mb-0 fs-5">
                                     {{question['question_text']}}
                                 </p>
                             </div>
 
                             <!-- Options List -->
-                            <div class="d-grid gap-2 mb-3">
+                            <div class="d-grid gap-2 mb-4">
                                 % for opt in ['a', 'b', 'c', 'd']:
                                     <div class="position-relative">
                                         <input 
@@ -69,29 +66,27 @@
                                             autocomplete="off" 
                                             required
                                         >
-                                        <label class="btn option-label" for="option_{{opt}}">
-                                            <span class="option-prefix">{{opt}}</span>
+                                        <label class="btn btn-outline-light text-dark text-start w-100 p-3 rounded-3 border d-flex align-items-center gap-3 shadow-sm-hover" for="option_{{opt}}">
+                                            <span class="badge bg-secondary-subtle text-secondary rounded-circle px-2 py-1 text-uppercase fw-bold">{{opt}}</span>
                                             <span>{{question['option_' + opt]}}</span>
                                         </label>
                                     </div>
                                 % end
                             </div>
 
-                            <button type="submit" class="btn btn-primary submit-btn">
+                            <button type="submit" class="btn btn-primary w-100 py-2.5 rounded-3 fw-bold">
                                 Submit Answer
                             </button>
                         </form>
 
                     <!-- Cooldown State -->
                     % elif cooldown_remaining:
-
-                        <div class="cooldown-box">
-                            <h6 class="fw-bold mb-1">Cooldown Active</h6>
+                        <div class="text-center py-4 bg-light rounded-4 border border-dashed">
+                            <h6 class="fw-bold mb-1 text-dark">Cooldown Active</h6>
                             <p class="mb-0 text-muted small">
                                 You can try another question in <span class="fw-bold text-dark">{{cooldown_remaining}} minutes</span>.
                             </p>
                         </div>
-
                     % end
 
                 </div>
