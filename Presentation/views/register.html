@@ -1,34 +1,44 @@
-
 % rebase('base.html')
 
+% if error:
+<div class="alert alert-danger mb-3 py-2 small">{{error}}</div>
+% end
+
 <div class="row justify-content-center">
-    <div class="col-md-5">
-        <div class="card">
-            <div class="card-body">
-                <h2 class="card-title text-center mb-4">Register</h2>
+    <div class="col-md-5 col-lg-4">
+        <div class="card border-0 shadow-lg rounded-4 p-2">
+            <div class="card-body p-3">
+                <!-- Header -->
+                <div class="text-center mb-2">
+                    <img src="/static/logo.png" alt="ZeroRisk Logo" class="img-fluid mb-0" style="max-width: 120px;">
+                    <h3 class="fw-bold mb-0">Register</h3>
+                </div>
 
-                % if error:
-                    <div class="alert alert-danger">{{error}}</div>
-                % end
-
+                <!-- Form -->
                 <form action="/register" method="POST">
-                    <div class="form-group mb-3">
-                        <label for="username">Username</label>
-                        <input type="text" class="form-control" name="username" id="username" placeholder="Enter your username" required>
+                    <div class="form-group mb-2 text-start">
+                        <label for="username" class="form-label fw-bold mb-1 small">Username</label>
+                        <input type="text" class="form-control rounded-3" name="username" id="username"
+                            placeholder="Enter your username" required>
                     </div>
-                    <div class="form-group mb-3">
-                        <label for="email">Email</label>
-                        <input type="email" class="form-control" name="email" id="email" placeholder="Enter your email" required>
+                    <div class="form-group mb-2 text-start">
+                        <label for="email" class="form-label fw-bold mb-1 small">Email</label>
+                        <input type="email" class="form-control rounded-3" name="email" id="email"
+                            placeholder="Enter your email" required>
                     </div>
-                    <div class="form-group mb-3">
-                        <label for="password">Password</label>
-                        <input type="password" class="form-control" name="password" id="password" placeholder="Password" required>
+                    <div class="form-group mb-3 text-start">
+                        <label for="password" class="form-label fw-bold mb-1 small">Password</label>
+                        <input type="password" class="form-control rounded-3" name="password" id="password" 
+                            placeholder="Password" required>
                     </div>
-                    <button type="submit" class="btn btn-primary w-100">Register</button>
+                    <button type="submit" class="btn btn-primary w-100 rounded-pill fw-bold">Register</button>
                 </form>
 
-                <p class="text-center mt-3">
-                    Already have an account? <a href="/login">Login</a>
+                <hr class="my-3">
+
+                <!-- Footer link -->
+                <p class="text-center mb-0 small">
+                    Already have an account? <a href="/login" class="fw-bold text-decoration-none">Login</a>
                 </p>
             </div>
         </div>
