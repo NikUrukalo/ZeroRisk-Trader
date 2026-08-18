@@ -169,12 +169,63 @@ def add_balance_get():
 
     balance = trading_service.get_balance(user.user_id)
 
+    question = None
+    cooldown_remaining = None
+    try:
+        question = trading_service.get_trivia_question(user.user_id)
+    except ValueError:
+        cooldown_remaining = trading_service.get_trivia_cooldown_remaining(user.user_id)
+
     return template(
         'add_balance',
         user=username,
         balance=balance,
+        question=question,
+        cooldown_remaining=cooldown_remaining,
         error=None,
         success=None
+    )
+
+
+@app.post('/trivia/answer')
+@cookie_required
+def trivia_answer_post():
+
+    username = request.get_cookie("user")
+    user = auth.get_user_by_username(username)
+
+    question_id = int(request.forms.get('question_id'))
+    submitted_option = request.forms.get('submitted_option')
+
+    error = None
+    success = None
+    question = None
+    cooldown_remaining = None
+
+    try:
+        result = trading_service.submit_trivia_answer(user.user_id, question_id, submitted_option)
+
+        if result['was_correct']:
+            success = f"Correct! You earned €{result['reward_amount']:.2f}."
+        else:
+            error = f"Not quite — the correct answer was {result['correct_option']}."
+
+        cooldown_remaining = trading_service.get_trivia_cooldown_remaining(user.user_id)
+
+    except ValueError as e:
+        error = str(e)
+        cooldown_remaining = trading_service.get_trivia_cooldown_remaining(user.user_id)
+
+    balance = trading_service.get_balance(user.user_id)
+
+    return template(
+        'add_balance',
+        user=username,
+        balance=balance,
+        question=question,
+        cooldown_remaining=cooldown_remaining,
+        error=error,
+        success=success
     )
 
 

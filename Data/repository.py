@@ -266,3 +266,79 @@ class Repo:
         """, (portfolio_id, asset_symbol))
 
         self.conn.commit()
+
+
+    # trivia 
+
+    def get_random_trivia_question(self) -> Optional[TriviaQuestion]:
+        self.cur.execute("""
+            SELECT question_id, question_text, option_a, option_b,
+                   option_c, option_d, correct_option, reward_amount
+            FROM trivia_question
+            ORDER BY RANDOM()
+            LIMIT 1
+        """)
+
+        row = self.cur.fetchone()
+        return TriviaQuestion.from_dict(row) if row else None
+
+    def get_trivia_question_by_id(self, question_id: int) -> Optional[TriviaQuestion]:
+        self.cur.execute("""
+            SELECT question_id, question_text, option_a, option_b,
+                   option_c, option_d, correct_option, reward_amount
+            FROM trivia_question
+            WHERE question_id = %s
+        """, (question_id,))
+
+        row = self.cur.fetchone()
+        return TriviaQuestion.from_dict(row) if row else None
+
+    def insert_trivia_question(self, question_text: str, option_a: str, option_b: str,
+                                option_c: str, option_d: str, correct_option: str,
+                                reward_amount: float = 250.00) -> int:
+        self.cur.execute("""
+            INSERT INTO trivia_question
+                (question_text, option_a, option_b, option_c, option_d, correct_option, reward_amount)
+            VALUES (%s, %s, %s, %s, %s, %s, %s)
+            RETURNING question_id;
+        """, (question_text, option_a, option_b, option_c, option_d, correct_option, reward_amount))
+
+        question_id = self.cur.fetchone()['question_id']
+        self.conn.commit()
+        return question_id
+
+    def get_last_trivia_attempt(self, portfolio_id: int) -> Optional[TriviaAttempt]:
+        self.cur.execute("""
+            SELECT attempt_id, portfolio_id, question_id, was_correct, attempted_at
+            FROM trivia_attempt
+            WHERE portfolio_id = %s
+            ORDER BY attempted_at DESC
+            LIMIT 1
+        """, (portfolio_id,))
+
+        row = self.cur.fetchone()
+        return TriviaAttempt.from_dict(row) if row else None
+
+    def insert_trivia_attempt(self, portfolio_id: int, question_id: int, was_correct: bool) -> None:
+        self.cur.execute("""
+            INSERT INTO trivia_attempt (portfolio_id, question_id, was_correct)
+            VALUES (%s, %s, %s)
+        """, (portfolio_id, question_id, was_correct))
+
+        self.conn.commit()
+
+    def credit_portfolio_balance(self, portfolio_id: int, amount: float) -> float:
+        """
+        Adds `amount` to virtual_balance for a given portfolio_id and
+        returns the new balance. 
+        """
+        self.cur.execute("""
+            UPDATE portfolio
+            SET virtual_balance = virtual_balance + %s
+            WHERE portfolio_id = %s
+            RETURNING virtual_balance;
+        """, (amount, portfolio_id))
+
+        new_balance = self.cur.fetchone()['virtual_balance']
+        self.conn.commit()
+        return new_balance
