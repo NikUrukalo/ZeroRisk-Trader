@@ -2,6 +2,9 @@ from Data.repository import Repo
 from Data.models import *
 from typing import List
 from decimal import Decimal
+from datetime import datetime, timedelta
+
+TRIVIA_COOLDOWN_MINUTES = 60
 
 
 class TradingService:
@@ -219,3 +222,81 @@ class TradingService:
             reverse=True
         )
         return movers[:5]
+
+    # trivia
+    
+    def get_trivia_question(self, user_id: int) -> dict:
+        """
+        Returns a random trivia question (without the correct answer)
+        if the user isn't on cooldown, otherwise raises ValueError.
+        """
+        portfolio_id = self.repo.get_portfolio_id(user_id)
+
+        remaining = self._trivia_cooldown_remaining(portfolio_id)
+        if remaining is not None:
+            raise ValueError(f"Trivia is on cooldown for {remaining} more second(s).")
+
+        question = self.repo.get_random_trivia_question()
+        if question is None:
+            raise ValueError("No trivia questions available.")
+
+        return {
+            "question_id": question.question_id,
+            "question_text": question.question_text,
+            "option_a": question.option_a,
+            "option_b": question.option_b,
+            "option_c": question.option_c,
+            "option_d": question.option_d,
+            "reward_amount": float(question.reward_amount),
+        }
+
+    def submit_trivia_answer(self, user_id: int, question_id: int, submitted_option: str) -> dict:
+        """
+        Grades the submitted answer, logs the attempt, and credits the
+        portfolio's balance if correct. Returns the result.
+        """
+        portfolio_id = self.repo.get_portfolio_id(user_id)
+
+        remaining = self._trivia_cooldown_remaining(portfolio_id)
+        if remaining is not None:
+            raise ValueError(f"Trivia is on cooldown for {remaining} more second(s).")
+
+        question = self.repo.get_trivia_question_by_id(question_id)
+        if question is None:
+            raise ValueError("Trivia question not found.")
+
+        was_correct = question.correct_option.strip().upper() == submitted_option.strip().upper()
+        self.repo.insert_trivia_attempt(portfolio_id, question_id, was_correct)
+
+        new_balance = None
+        if was_correct:
+            new_balance = self.repo.credit_portfolio_balance(portfolio_id, float(question.reward_amount))
+
+        return {
+            "was_correct": was_correct,
+            "correct_option": question.correct_option,
+            "reward_amount": float(question.reward_amount) if was_correct else 0.0,
+            "new_balance": float(new_balance) if new_balance is not None else float(self.get_balance(user_id)),
+        }
+
+    # internal helper 
+
+    def _trivia_cooldown_remaining(self, portfolio_id):
+        """
+        Returns remaining cooldown in whole seconds, or None if the
+        user is free to attempt trivia right now.
+        """
+        last_attempt = self.repo.get_last_trivia_attempt(portfolio_id)
+        if last_attempt is None:
+            return None
+
+        elapsed = datetime.now() - last_attempt.attempted_at
+        cooldown = timedelta(minutes=TRIVIA_COOLDOWN_MINUTES)
+        if elapsed >= cooldown:
+            return None
+
+        return int((cooldown - elapsed).total_seconds())
+
+    def get_trivia_cooldown_remaining(self, user_id):
+        portfolio_id = self.repo.get_portfolio_id(user_id)
+        return self._trivia_cooldown_remaining(portfolio_id)

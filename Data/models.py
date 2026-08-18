@@ -113,3 +113,41 @@ class TradeDto:
     quantity: float = field(default=0.0)
     price: float = field(default=0.0)
     trade_type: str = field(default='')
+
+
+### TriviaQuestion
+@dataclass_json
+@dataclass
+class TriviaQuestion:
+    question_id: int = field(default=0)
+    question_text: str = field(default='')
+    option_a: str = field(default='')
+    option_b: str = field(default='')
+    option_c: str = field(default='')
+    option_d: str = field(default='')
+    correct_option: str = field(default='')  # 'A', 'B', 'C', or 'D'
+    reward_amount: float = field(default=0.0)
+
+@dataclass_json
+@dataclass
+class TriviaQuestionDto:
+    # sent to the client -- correct_option is hidden 
+    # so the answer isn't visible in the frontend payload
+    question_id: int = field(default=0)
+    question_text: str = field(default='')
+    option_a: str = field(default='')
+    option_b: str = field(default='')
+    option_c: str = field(default='')
+    option_d: str = field(default='')
+    reward_amount: float = field(default=0.0)
+
+
+### TriviaAttempt
+@dataclass_json
+@dataclass
+class TriviaAttempt:
+    attempt_id: int = field(default=0)
+    portfolio_id: int = field(default=0)
+    question_id: int = field(default=0)
+    was_correct: bool = field(default=False)
+    attempted_at: datetime = field(default=None)
