@@ -48,6 +48,7 @@ def login_post():
     if log_in:
         response.set_cookie("user", username)
         response.set_cookie("user_id", str(log_in.user_id))
+        auth.refresh_assets()
         return redirect('/overview')
     else:
         return template('login', user=None, success=None, error="Unsuccessful login. Wrong username or password.")
