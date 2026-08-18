@@ -209,8 +209,9 @@ class Repo:
                 Used to see history.
         """
         self.cur.execute("""
-            SELECT trade_id, portfolio_id, asset_symbol, quantity, price, trade_type, created_at
-            FROM trade
+            SELECT t.trade_id, t.portfolio_id, a.asset_name, t.asset_symbol, t.quantity, t.price, t.trade_type, t.created_at
+            FROM trade t
+            JOIN asset_master a ON t.asset_symbol = a.asset_symbol
             WHERE portfolio_id = %s
             ORDER BY created_at DESC
         """, (portfolio_id,))
