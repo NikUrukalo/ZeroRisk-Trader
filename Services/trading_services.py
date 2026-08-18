@@ -70,7 +70,7 @@ class TradingService:
 
     # trading 
 
-    def buy_asset(self, user_id: int, asset_symbol: str, quantity: float) -> None:
+    def buy_asset(self, user_id: int, asset_symbol: str, quantity: float) -> str:
         if quantity <= 0:
             raise ValueError("Quantity must be positive.")
 
@@ -87,10 +87,9 @@ class TradingService:
         if balance < cost:
             raise ValueError("Insufficient balance for this trade.")
 
-        existing_position = self.repo.get_position(portfolio_id, asset_symbol)
-
         self.repo.insert_trade(portfolio_id, asset_symbol, quantity, price, "BUY")
 
+        existing_position = self.repo.get_position(portfolio_id, asset_symbol)
         if existing_position is None:
             self.repo.insert_position(portfolio_id, asset_symbol, quantity, price)
         else:
@@ -100,7 +99,10 @@ class TradingService:
 
         self.repo.update_balance(user_id, -float(cost))
 
-    def sell_asset(self, user_id: int, asset_symbol: str, quantity: float) -> None:
+        return f"Bought {quantity} {asset_symbol} at €{price:.2f} (total €{cost:.2f})."
+
+
+    def sell_asset(self, user_id: int, asset_symbol: str, quantity: float) -> str:
         if quantity <= 0:
             raise ValueError("Quantity must be positive.")
 
@@ -126,6 +128,8 @@ class TradingService:
             self.repo.update_position(portfolio_id, asset_symbol, remaining_quantity, position.avg_buy_price)
 
         self.repo.update_balance(user_id, float(proceeds))
+
+        return f"Sold {quantity} {asset_symbol} at €{price:.2f} (total €{proceeds:.2f})."
 
     # internal helper 
 

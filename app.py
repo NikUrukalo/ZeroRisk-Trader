@@ -106,19 +106,26 @@ def trade_buy():
     asset_symbol = request.forms.get('asset_symbol')
     quantity = float(request.forms.get('quantity'))
 
+    assets = trading_service.get_all_assets()
+    top_movers = trading_service.get_top_5_movers()
+
     try:
-        trading_service.buy_asset(
+        message = trading_service.buy_asset(
             user.user_id,
             asset_symbol,
             quantity
         )
 
-        return redirect('/trade')
+        return template(
+            'trade',
+            user=username,
+            assets=assets,
+            top_movers=top_movers,
+            error=None,
+            success=message
+        )
 
     except ValueError as e:
-        assets = trading_service.get_all_assets()
-        top_movers = trading_service.get_top_5_movers()
-
         return template(
             'trade',
             user=username,
@@ -138,19 +145,26 @@ def trade_sell():
     asset_symbol = request.forms.get('asset_symbol')
     quantity = float(request.forms.get('quantity'))
 
+    assets = trading_service.get_all_assets()
+    top_movers = trading_service.get_top_5_movers()
+
     try:
-        trading_service.sell_asset(
+        message = trading_service.sell_asset(
             user.user_id,
             asset_symbol,
             quantity
         )
 
-        return redirect('/trade')
+        return template(
+            'trade',
+            user=username,
+            assets=assets,
+            top_movers=top_movers,
+            error=None,
+            success=message
+        )
 
     except ValueError as e:
-        assets = trading_service.get_all_assets()
-        top_movers = trading_service.get_top_5_movers()
-
         return template(
             'trade',
             user=username,
