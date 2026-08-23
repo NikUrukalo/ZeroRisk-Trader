@@ -1,8 +1,8 @@
 /*Seed data for table trivia_questions*/
 
+select *
+from app_user
 
-SELECT *
-FROM trivia_question
 /*
 INSERT INTO trivia_question (question_text, option_a, option_b, option_c, option_d, correct_option, reward_amount) VALUES
 ('What does "ETF" stand for?', 'Exchange Traded Fund', 'Equity Transfer Form', 'Estimated Trade Fee', 'External Trading Firm', 'A', 250.00),

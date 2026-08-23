@@ -1,17 +1,19 @@
-import bottle
+import bottle # web frame-work
 from bottle import Bottle, run, template, static_file, request, response, redirect
 from functools import wraps
+import psycopg2
 
 from Services.auth_service import AuthService
 from Services.trading_services import TradingService
 
+# detting up the app
 trading_service = TradingService()
 auth = AuthService()
 
-bottle.TEMPLATE_PATH.insert(0, 'Presentation/views/')
-
+bottle.TEMPLATE_PATH.insert(0, 'Presentation/views/') # adds my custom path ath the front of the list
 app = Bottle()
 
+# cookie
 def cookie_required(f):
     """
     Decorator that requires a valid cookie. If the cookie is missing,
@@ -25,12 +27,12 @@ def cookie_required(f):
         return redirect('/login')
     return decorated
 
-# Serve static CSS / JS
 @app.route('/static/<filename:path>')
 def serve_static(filename):
     return static_file(filename, root='Presentation/static/')
 
-@app.route('/')
+# login
+@app.route('/') 
 @app.route('/login', name='login')
 def login_get():
     return template('login', user=None, success=None, error=None)
@@ -51,9 +53,9 @@ def login_post():
         auth.refresh_assets()
         return redirect('/overview')
     else:
-        return template('login', user=None, success=None, error="Unsuccessful login. Wrong username or password.")
-
-
+        return template('login', user=None, success=None, error="Unsuccessful login; wrong username or password. Please, try again.")
+    
+# register
 @app.route('/register', name='register')
 def register_get():
     return template('register', user=None, success=None, error=None)
@@ -64,11 +66,66 @@ def register_post():
     email = request.forms.get('email')
     password = request.forms.get('password')
 
-    user_id = auth.insert_user(username, email, password)
+@app.post('/register')
+def register_post():
+    username = request.forms.get('username')
+    email = request.forms.get('email')
+    password = request.forms.get('password')
 
-    return redirect('/login')
+    # catch invalid emails before hitting the database
+    if '@' not in email or '.' not in email:
+        return template(
+            'register', 
+            user=None, 
+            success=None, 
+            error="Please enter a valid email address."
+        )
 
+    # password requirements
+    has_min_length = len(password) >= 8
+    has_digit = any(char.isdigit() for char in password)
+    has_uppercase = any(char.isupper() for char in password)
 
+    if not (has_min_length and has_digit and has_uppercase):
+        return template(
+            'register',
+            user=None,
+            success=None,
+            error="Error; password must be at least 8 characters long, contain at least one number, and one uppercase letter."
+        )
+
+    try:
+        user_id = auth.insert_user(username, email, password)
+        return template(
+            'login', 
+            user=None, 
+            success="Account created successfully. You can now log in.", 
+            error=None
+        )
+    
+    except psycopg2.errors.UniqueViolation:
+        # roollback the broken database transaction so it works again
+        auth.repo.conn.rollback() 
+        
+        # return the user to the register page with the error
+        return template(
+            'register', 
+            user=None, 
+            success=None, 
+            error="Registration failed. An account with this email or username already exists."
+        )
+    
+    except Exception as e:
+        # catch any other weird errors and also rollback
+        auth.repo.conn.rollback()
+        return template(
+            'register', 
+            user=None, 
+            success=None, 
+            error="An unexpected error occurred. Please try again."
+        )
+
+# overview page
 @app.route('/overview', name='overview')
 @cookie_required
 def overview():

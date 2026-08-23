@@ -1,4 +1,4 @@
-/* ======================== Table Creation =========================== */
+/* Table Creation */
 
 CREATE TABLE IF NOT EXISTS app_user (
     user_id SERIAL PRIMARY KEY,
@@ -67,38 +67,23 @@ CREATE TABLE IF NOT EXISTS trivia_attempt (
     attempted_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
 
-/* ======================== Permissions =========================== */
 
-GRANT ALL ON DATABASE sem2026_nejczi TO nikuru WITH GRANT OPTION;
-GRANT CONNECT ON DATABASE sem2026_nejczi TO nikuru;
+/* Permissions */
+
+-- allow connecting to the DB (if not already)
 GRANT CONNECT ON DATABASE sem2026_nejczi TO javnost;
+GRANT CONNECT ON DATABASE sem2026_nejczi TO nikuru;
 
-GRANT SELECT, DELETE, INSERT, UPDATE ON TABLE app_user TO javnost;
-GRANT ALL PRIVILEGES ON SEQUENCE app_user_user_id_seq TO javnost;
+-- allow usage of the schema 
+GRANT USAGE ON SCHEMA public TO javnost;
+GRANT USAGE ON SCHEMA public TO nikuru;
 
-GRANT SELECT, DELETE, INSERT, UPDATE ON TABLE portfolio TO javnost;
-GRANT ALL PRIVILEGES ON SEQUENCE portfolio_portfolio_id_seq TO javnost;
+-- grant privileges on all existing tables in the schema
+GRANT SELECT, INSERT, UPDATE, DELETE ON ALL TABLES IN SCHEMA public TO javnost;
+GRANT SELECT, INSERT, UPDATE, DELETE ON ALL TABLES IN SCHEMA public TO nikuru;
 
-GRANT SELECT, INSERT ON TABLE asset_master TO javnost;
-GRANT SELECT, DELETE, INSERT, UPDATE ON TABLE asset_master TO nikuru;
+-- grant privileges on all existing sequences in the schema
+GRANT USAGE, SELECT, UPDATE ON ALL SEQUENCES IN SCHEMA public TO javnost;
+GRANT USAGE, SELECT, UPDATE ON ALL SEQUENCES IN SCHEMA public TO nikuru;
 
-GRANT SELECT, INSERT ON TABLE asset TO javnost;
-GRANT SELECT, DELETE, INSERT, UPDATE ON TABLE asset TO nikuru;
-GRANT ALL PRIVILEGES ON SEQUENCE asset_asset_id_seq TO nikuru;
-
-GRANT SELECT, DELETE, INSERT, UPDATE ON TABLE trade TO javnost;
-GRANT ALL PRIVILEGES ON SEQUENCE trade_trade_id_seq TO javnost;
-
-GRANT SELECT, DELETE, INSERT, UPDATE ON TABLE position TO javnost;
-GRANT ALL PRIVILEGES ON SEQUENCE position_position_id_seq TO javnost;
-
-GRANT ALL PRIVILEGES ON SEQUENCE asset_asset_id_seq TO javnost;
-
-GRANT SELECT, DELETE, INSERT, UPDATE ON TABLE trivia_question TO javnost;
-GRANT ALL PRIVILEGES ON SEQUENCE trivia_question_question_id_seq TO javnost;
-
-GRANT SELECT, DELETE, INSERT, UPDATE ON TABLE trivia_attempt TO javnost;
-GRANT ALL PRIVILEGES ON SEQUENCE trivia_attempt_attempt_id_seq TO javnost;
-
-select * from asset
 

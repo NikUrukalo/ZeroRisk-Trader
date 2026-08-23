@@ -48,10 +48,7 @@ class AssetMaster:
     asset_name: str = field(default='')
     asset_type: str = field(default='')
 
-# This is the *joined* view (asset_master + asset price snapshot),
-# not a 1:1 mapping to a single table anymore. The repository builds this
-# by joining asset with asset_master. asset_id here is the id of the
-# specific price snapshot row, not the symbol's identity.
+# This is the joined view (asset_master + asset price),
 @dataclass_json
 @dataclass
 class Asset:

@@ -1,5 +1,9 @@
 % rebase('base.html')
 
+% if success:
+<div class="alert alert-success mb-3 py-2 small">{{success}}</div>
+% end
+
 % if error:
 <div class="alert alert-danger mb-3 py-2 small">{{error}}</div>
 % end
