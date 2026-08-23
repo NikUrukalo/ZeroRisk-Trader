@@ -1,14 +1,7 @@
 requests
 pandas
-os
-shutil
-dataclasses
-dataclasses_json 
-datetime 
-psycopg2
-yf
-pd
-time
-Path
+psycopg2-binary
+dataclasses-json
+yfinance
 bcrypt
 bottle
