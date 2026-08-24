@@ -66,12 +66,6 @@ def register_post():
     email = request.forms.get('email')
     password = request.forms.get('password')
 
-@app.post('/register')
-def register_post():
-    username = request.forms.get('username')
-    email = request.forms.get('email')
-    password = request.forms.get('password')
-
     # catch invalid emails before hitting the database
     if '@' not in email or '.' not in email:
         return template(
