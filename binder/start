@@ -4,14 +4,5 @@ export BOTTLE_RELOADER=1
 export BOTTLE_ROOT=${JUPYTERHUB_SERVICE_PREFIX}proxy/${BOTTLE_PORT}/
 export BOTTLE_RUNTIME=app.py
 export POSTGRES_PORT=443
-
-
-
-export DB_NAME=sem2026_nejczi
-export DB_HOST=baza.fmf.uni-lj.si
-export DB_USER=javnost
-export DB_PASSWORD=javnogeslo
-export DB_PORT=443
-
 python ${BOTTLE_RUNTIME} &
 exec "$@"
