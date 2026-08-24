@@ -1,5 +1,4 @@
-import bottle # web frame-work
-from bottle import Bottle, run, template, static_file, request, response, redirect
+from bottleext import Bottle, run, template, static_file, request, response, redirect
 from functools import wraps
 import psycopg2
 
