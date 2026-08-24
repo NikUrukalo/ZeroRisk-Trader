@@ -1,7 +1,0 @@
-requests
-pandas
-psycopg2-binary
-dataclasses-json
-yfinance
-bcrypt
-bottle
