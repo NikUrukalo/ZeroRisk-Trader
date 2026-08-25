@@ -269,7 +269,14 @@ class TradingService:
         if question is None:
             raise ValueError("Trivia question not found.")
 
-        was_correct = question.correct_option.strip().upper() == submitted_option.strip().upper()
+        # (submitted_option or '') - the browser sends nothing at all when no
+        # radio was selected, and None.strip() is an AttributeError, which the
+        # route's `except ValueError` does not catch. That was a 500 page.
+        submitted = (submitted_option or '').strip().upper()
+        if submitted not in ('A', 'B', 'C', 'D'):
+            raise ValueError("Please choose one of the four answers.")
+
+        was_correct = question.correct_option.strip().upper() == submitted
         self.repo.insert_trivia_attempt(portfolio_id, question_id, was_correct)
 
         new_balance = None
@@ -290,16 +297,19 @@ class TradingService:
         Returns remaining cooldown in whole seconds, or None if the
         user is free to attempt trivia right now.
         """
-        last_attempt = self.repo.get_last_trivia_attempt(portfolio_id)
-        if last_attempt is None:
+        elapsed_seconds = self.repo.get_seconds_since_last_trivia_attempt(portfolio_id)
+        if elapsed_seconds is None:              # never answered anything yet
             return None
 
-        elapsed = datetime.now() - last_attempt.attempted_at
-        cooldown = timedelta(minutes=TRIVIA_COOLDOWN_MINUTES)
-        if elapsed >= cooldown:
+        cooldown_seconds = TRIVIA_COOLDOWN_MINUTES * 60
+        if elapsed_seconds >= cooldown_seconds:
             return None
 
-        return int((cooldown - elapsed).total_seconds() / 60)
+        # Round UP, and never report 0: add_balance.html shows the cooldown box
+        # with `% elif cooldown_remaining:`, and a 0 is falsy, so the last
+        # minute of the wait used to render an empty card.
+        remaining_minutes = (cooldown_seconds - elapsed_seconds + 59) // 60
+        return max(1, remaining_minutes)
 
     def get_trivia_cooldown_remaining(self, user_id):
         portfolio_id = self.repo.get_portfolio_id(user_id)

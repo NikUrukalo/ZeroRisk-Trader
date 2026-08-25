@@ -403,9 +403,12 @@ def trivia_answer_post():
     username = request.get_cookie("user")
     user = auth.get_user_by_username(username)
 
-    question_id = int(
-        request.forms.get('question_id')
-    )
+    # Both of these arrive straight from the browser and both can be missing:
+    # question_id if the form was submitted from a stale page, submitted_option
+    # if no radio was selected. int(None) and None.strip() are TypeError and
+    # AttributeError - neither is a ValueError, so neither was caught below,
+    # and both ended as a 500 page.
+    question_id_raw = request.forms.get('question_id')
 
     submitted_option = request.forms.get(
         'submitted_option'
@@ -417,6 +420,13 @@ def trivia_answer_post():
     cooldown_remaining = None
 
     try:
+
+        if not question_id_raw or not str(question_id_raw).strip().isdigit():
+            raise ValueError(
+                "That question is no longer available. Please reload the page."
+            )
+
+        question_id = int(question_id_raw)
 
         result = trading_service.submit_trivia_answer(
             user.user_id,

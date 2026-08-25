@@ -320,6 +320,27 @@ class Repo:
         row = self.cur.fetchone()
         return TriviaAttempt.from_dict(row) if row else None
 
+    def get_seconds_since_last_trivia_attempt(self, portfolio_id: int) -> Optional[int]:
+        """
+        How long ago this portfolio last answered, measured entirely by the
+        DATABASE clock. Returns None if they have never answered.
+
+        Why not do the subtraction in Python: attempted_at is written by the
+        database with CURRENT_TIMESTAMP, i.e. in the database server's local
+        time (CEST). datetime.now() on Binder is UTC. Subtracting one from the
+        other is off by two hours, which made the cooldown either far too long
+        or negative depending on the direction. Asking PostgreSQL to subtract
+        two of its own timestamps removes the second clock from the problem.
+        """
+        self.cur.execute("""
+            SELECT EXTRACT(EPOCH FROM (CURRENT_TIMESTAMP - MAX(attempted_at)))::int AS seconds
+            FROM trivia_attempt
+            WHERE portfolio_id = %s
+        """, (portfolio_id,))
+
+        row = self.cur.fetchone()
+        return row['seconds'] if row and row['seconds'] is not None else None
+
     def insert_trivia_attempt(self, portfolio_id: int, question_id: int, was_correct: bool) -> None:
         self.cur.execute("""
             INSERT INTO trivia_attempt (portfolio_id, question_id, was_correct)
