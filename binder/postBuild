@@ -1,2 +1,3 @@
 #!/bin/bash
-jupyter server extension enable --sys-prefix jupyter_server_proxy
+set -e
+echo "postBuild: environment ready for ZeroRisk Trader."
