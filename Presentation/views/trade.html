@@ -60,7 +60,7 @@
                                     <td class="pe-4">
                                         <div class="d-flex gap-2 justify-content-end">
                                             <!-- BUY FORM -->
-                                            <form action="/trade/buy" method="POST" class="d-flex gap-1">
+                                            <form action="{{ url('/trade/buy') }}" method="POST" class="d-flex gap-1">
                                                 <input type="hidden" name="asset_symbol" value="{{asset.asset_symbol}}">
                                                 <input
                                                     type="number"
@@ -76,7 +76,7 @@
                                             </form>
 
                                             <!-- SELL FORM -->
-                                            <form action="/trade/sell" method="POST" class="d-flex gap-1">
+                                            <form action="{{ url('/trade/sell') }}" method="POST" class="d-flex gap-1">
                                                 <input type="hidden" name="asset_symbol" value="{{asset.asset_symbol}}">
                                                 <input
                                                     type="number"

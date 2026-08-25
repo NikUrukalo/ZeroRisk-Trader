@@ -44,7 +44,7 @@
                             </span>
                         </div>
 
-                        <form action="/trivia/answer" method="POST">
+                        <form action="{{ url('/trivia/answer') }}" method="POST">
                             <input type="hidden" name="question_id" value="{{question['question_id']}}">
 
                             <div class="mb-3">

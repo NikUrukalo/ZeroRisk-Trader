@@ -7,13 +7,11 @@ export BOTTLE_ROOT=${JUPYTERHUB_SERVICE_PREFIX}proxy/${BOTTLE_PORT}/
 export BOTTLE_RELOADER=0        # the reloader forks; it does not belong here
 export BOTTLE_DEBUG=0
 
-export DB_NAME=sem2026_nejczi
-export DB_HOST=baza.fmf.uni-lj.si
-export DB_USER=javnost
-export DB_PASSWORD=javnogeslo
-export DB_PORT=443
+export POSTGRES_PORT=443
 
-export SECRET_KEY=$(python -c "import secrets; print(secrets.token_hex(16))")
-
+# Start the app in the background and keep its output, so that if the page
+# stays blank you can open a Binder terminal and read the traceback:
+#     cat /tmp/zerorisk.log
 python app.py > /tmp/zerorisk.log 2>&1 &
+
 exec "$@"

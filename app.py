@@ -1,3 +1,5 @@
+import os
+
 import bottle
 from bottleext import (
     Bottle,
@@ -37,9 +39,38 @@ def cookie_required(f):
         if cookie:
             return f(*args, **kwargs)
 
-        return redirect(url('login'))
+        return redirect(url('/login'))
 
     return decorated
+
+
+
+def parse_quantity(raw):
+    """
+    Turn the quantity field into a float, or raise ValueError with a message
+    meant for the user.
+
+    The old code called float(request.forms.get('quantity')) directly. An
+    empty box or a typo raised
+        ValueError: could not convert string to float: ''
+    which Bottle turned into a 500 page with a traceback on it. Both trade
+    routes already catch ValueError and show `error=str(e)`, so raising a
+    readable ValueError here is all that is needed.
+    """
+    raw = (raw or '').strip().replace(',', '.')
+
+    if not raw:
+        raise ValueError("Please enter a quantity.")
+
+    try:
+        quantity = float(raw)
+    except ValueError:
+        raise ValueError(f"'{raw}' is not a valid number.")
+
+    if quantity <= 0:
+        raise ValueError("Quantity must be greater than zero.")
+
+    return quantity
 
 
 # Static files
@@ -82,7 +113,7 @@ def login_post():
 
         # auth.refresh_assets()
 
-        return redirect(url('overview'))
+        return redirect(url('/overview'))
 
     else:
         return template(
@@ -232,14 +263,17 @@ def trade_buy():
     user = auth.get_user_by_username(username)
 
     asset_symbol = request.forms.get('asset_symbol')
-    quantity = float(
-        request.forms.get('quantity')
-    )
 
     assets = trading_service.get_all_assets()
     top_movers = trading_service.get_top_5_movers()
 
     try:
+
+        # Inside the try, so a bad quantity shows the same red banner as
+        # "Insufficient balance" instead of a 500 page.
+        quantity = parse_quantity(
+            request.forms.get('quantity')
+        )
 
         message = trading_service.buy_asset(
             user.user_id,
@@ -276,14 +310,17 @@ def trade_sell():
     user = auth.get_user_by_username(username)
 
     asset_symbol = request.forms.get('asset_symbol')
-    quantity = float(
-        request.forms.get('quantity')
-    )
 
     assets = trading_service.get_all_assets()
     top_movers = trading_service.get_top_5_movers()
 
     try:
+
+        # Inside the try, so a bad quantity shows the same red banner as
+        # "Insufficient balance" instead of a 500 page.
+        quantity = parse_quantity(
+            request.forms.get('quantity')
+        )
 
         message = trading_service.sell_asset(
             user.user_id,
@@ -457,6 +494,11 @@ def add_balance_post():
             'add_balance',
             user=username,
             balance=balance,
+            # add_balance.html reads `question` and `cooldown_remaining`.
+            # Leaving them out raised NameError inside the template, so every
+            # use of this route was a 500.
+            question=None,
+            cooldown_remaining=None,
             error=None,
             success=(
                 f"Successfully added "
@@ -474,6 +516,8 @@ def add_balance_post():
             'add_balance',
             user=username,
             balance=balance,
+            question=None,
+            cooldown_remaining=None,
             error=str(e),
             success=None
         )
@@ -500,7 +544,7 @@ def logout():
     )
 
     return redirect(
-        url('login')
+        url('/login')
     )
 
 
@@ -510,10 +554,12 @@ def logout():
 
 if __name__ == '__main__':
 
+    # Read the port and host from the environment so that binder/start can
+    # set them without editing this file.
     run(
         app,
-        host="0.0.0.0",
-        port=8080,
-        debug=False,
-        reloader=False
+        host=os.environ.get("BOTTLE_HOST", "0.0.0.0"),
+        port=int(os.environ.get("BOTTLE_PORT", 8080)),
+        debug=os.environ.get("BOTTLE_DEBUG", "0") == "1",
+        reloader=os.environ.get("BOTTLE_RELOADER", "0") == "1"
     )
