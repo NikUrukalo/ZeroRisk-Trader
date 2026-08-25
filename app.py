@@ -39,7 +39,10 @@ def cookie_required(f):
         if cookie:
             return f(*args, **kwargs)
 
-        return redirect(url('/login'))
+        # bottleext.redirect() takes a bare path and turns it into an absolute
+        # URL itself - do NOT wrap it in url(), or the proxy prefix ends up on
+        # the Location header twice.
+        return redirect('/login')
 
     return decorated
 
@@ -113,7 +116,7 @@ def login_post():
 
         # auth.refresh_assets()
 
-        return redirect(url('/overview'))
+        return redirect('/overview')
 
     else:
         return template(
@@ -543,9 +546,7 @@ def logout():
         expires=0
     )
 
-    return redirect(
-        url('/login')
-    )
+    return redirect('/login')
 
 
 # =========================

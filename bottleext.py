@@ -67,6 +67,91 @@ def url(path='/'):
     return ROOT + path if ROOT else path
 
 
+def absolute_url(path='/'):
+    """
+    The same link as url(), but as a full https://host/... address.
+
+    Only needed for redirects - see redirect() below.
+
+    Two details that are wrong if you build this by hand:
+
+    * The scheme has to come from X-Forwarded-Proto, because the app itself is
+      only ever spoken to over plain HTTP by the proxy. On Binder there are two
+      proxies in front of us, and each appends to that header, so its value is
+      the string "https,http". Taking .split(',')[0] gives the scheme the
+      BROWSER actually used. (Bottle does not do this - it uses the whole
+      header, which is why its error pages on Binder say
+      'https,http://hub.mybinder.org/...'.)
+
+    * The host likewise comes from X-Forwarded-Host, and gets the same
+      comma treatment.
+    """
+    env = bottle.request.environ
+
+    scheme = (env.get('HTTP_X_FORWARDED_PROTO')
+              or env.get('wsgi.url_scheme')
+              or 'http')
+    scheme = scheme.split(',')[0].strip()
+
+    host = (env.get('HTTP_X_FORWARDED_HOST')
+            or env.get('HTTP_HOST')
+            or '')
+    host = host.split(',')[0].strip()
+
+    if not host:                                   # direct, no proxy, no Host
+        host = env.get('SERVER_NAME', '127.0.0.1')
+        port = str(env.get('SERVER_PORT', ''))
+        if port and port not in ('80', '443'):
+            host = host + ':' + port
+
+    return scheme + '://' + host + url(path)
+
+
+def redirect(path='/'):
+    """
+    Redirect to a PATH, in a way that survives the Binder proxy.
+
+    This shadows bottle.redirect on purpose, so app.py keeps calling
+    `redirect('/overview')` and gets the corrected behaviour.
+
+    Why this is not just bottle.redirect(url('/overview'))
+    ------------------------------------------------------
+    jupyter-server-proxy treats the HTML body and the Location header
+    differently, and the difference is easy to miss:
+
+      * it does NOT touch the response body, so every link inside the HTML
+        must already carry the /user/<id>/proxy/8080 prefix - that is what
+        url() is for;
+
+      * but since version 4.5.0 it DOES rewrite the Location header of any
+        301/302/303/307/308, prepending that same prefix, because it assumes
+        the proxied app knows nothing about it (handlers.py,
+        _rewrite_location_header).
+
+    So sending Location: /user/<id>/proxy/8080/overview gets it prefixed a
+    SECOND time. The browser then asks for
+
+        /user/<id>/proxy/8080/user/<id>/proxy/8080/overview
+
+    the proxy strips one copy and hands the app the other, and Bottle answers
+
+        Error: 404 Not Found - Not found: '/user/<id>/proxy/8080/overview'
+
+    which is exactly the page you saw after logging in.
+
+    The way out is an ABSOLUTE url. _rewrite_location_header starts with
+
+        if parsed.scheme or parsed.netloc:   # absolute URL - leave as is
+            return location
+
+    so a Location of https://hub.mybinder.org/user/<id>/proxy/8080/overview is
+    passed through untouched. It is also correct on older proxy versions that
+    do no rewriting at all, and on localhost, where it is simply
+    http://localhost:8080/overview.
+    """
+    bottle.redirect(absolute_url(path))
+
+
 def template(*args, **kwargs):
     """bottle.template() with our url() always available inside templates."""
     kwargs.setdefault('url', url)
