@@ -97,6 +97,7 @@ class Trade:
     trade_id: int = field(default=0)
     portfolio_id: int = field(default=0)
     asset_symbol: str = field(default='')  # matches trade.asset_symbol in the DB
+    asset_name: str = field(default='')    # comes from the JOIN in get_all_trades
     quantity: float = field(default=0.0)
     price: float = field(default=0.0)
     trade_type: str = field(default='')   # BUY or SELL

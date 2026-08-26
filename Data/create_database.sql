@@ -10,8 +10,8 @@ CREATE TABLE IF NOT EXISTS app_user (
 
 CREATE TABLE IF NOT EXISTS portfolio (
     portfolio_id SERIAL PRIMARY KEY,
-    user_id INTEGER NOT NULL REFERENCES app_user(user_id) ON DELETE CASCADE, -- if a user is deleted, their portfolios are also deleted
-    virtual_balance NUMERIC(10, 2) NOT NULL,
+    user_id INTEGER NOT NULL UNIQUE REFERENCES app_user(user_id) ON DELETE CASCADE, -- one portfolio per user
+    virtual_balance NUMERIC(10, 2) NOT NULL CHECK (virtual_balance >= 0),
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
 
@@ -67,6 +67,10 @@ CREATE TABLE IF NOT EXISTS trivia_attempt (
     attempted_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
 
+-- user_name must be unique too, case-insensitively.
+CREATE UNIQUE INDEX IF NOT EXISTS app_user_user_name_key ON app_user (lower(user_name));
 
-
-
+-- Indexes for the queries the application runs.
+CREATE INDEX IF NOT EXISTS asset_symbol_time_idx ON asset (asset_symbol, date_stamp DESC, time_stamp DESC);
+CREATE INDEX IF NOT EXISTS trade_portfolio_idx   ON trade (portfolio_id, created_at DESC);
+CREATE INDEX IF NOT EXISTS position_portfolio_idx ON position (portfolio_id);

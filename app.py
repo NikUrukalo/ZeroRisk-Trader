@@ -9,7 +9,10 @@ from bottleext import (
     request,
     response,
     redirect,
-    url
+    url,
+    set_cookie,
+    get_cookie,
+    clear_cookie
 )
 from functools import wraps
 import psycopg2
@@ -35,7 +38,7 @@ def cookie_required(f):
     """
     @wraps(f)
     def decorated(*args, **kwargs):
-        cookie = request.get_cookie("user")
+        cookie = get_cookie("user")
 
         if cookie:
             return f(*args, **kwargs)
@@ -104,8 +107,8 @@ def login_post():
     log_in = auth.login_user(username, password)
 
     if log_in:
-        response.set_cookie("user", username)
-        response.set_cookie("user_id", str(log_in.user_id))
+        set_cookie("user", username)
+        set_cookie("user_id", log_in.user_id)
 
         # auth.refresh_assets()
 
@@ -179,21 +182,14 @@ def register_post():
 
     except psycopg2.errors.UniqueViolation:
 
-        # Rollback the broken database transaction
-        # so the connection works again
-        auth.repo.conn.rollback()
-
         return template(
             'register',
             user=None,
             success=None,
-            error="Registration failed. An account with this email or username already exists."
+            error="That username or e-mail address is already taken."
         )
 
     except Exception as e:
-
-        # Rollback any other database error
-        auth.repo.conn.rollback()
 
         return template(
             'register',
@@ -211,7 +207,7 @@ def register_post():
 @cookie_required
 def overview():
 
-    username = request.get_cookie("user")
+    username = get_cookie("user")
     user = auth.get_user_by_username(username)
 
     data = trading_service.get_overview(
@@ -235,7 +231,7 @@ def overview():
 @cookie_required
 def trade():
 
-    username = request.get_cookie("user")
+    username = get_cookie("user")
     user = auth.get_user_by_username(username)
 
     assets = trading_service.get_all_assets()
@@ -255,7 +251,7 @@ def trade():
 @cookie_required
 def trade_buy():
 
-    username = request.get_cookie("user")
+    username = get_cookie("user")
     user = auth.get_user_by_username(username)
 
     asset_symbol = request.forms.get('asset_symbol')
@@ -300,7 +296,7 @@ def trade_buy():
 @cookie_required
 def trade_sell():
 
-    username = request.get_cookie("user")
+    username = get_cookie("user")
     user = auth.get_user_by_username(username)
 
     asset_symbol = request.forms.get('asset_symbol')
@@ -349,7 +345,7 @@ def trade_sell():
 @cookie_required
 def add_balance_get():
 
-    username = request.get_cookie("user")
+    username = get_cookie("user")
     user = auth.get_user_by_username(username)
 
     balance = trading_service.get_balance(
@@ -389,7 +385,7 @@ def add_balance_get():
 @cookie_required
 def trivia_answer_post():
 
-    username = request.get_cookie("user")
+    username = get_cookie("user")
     user = auth.get_user_by_username(username)
 
     question_id_raw = request.forms.get('question_id')
@@ -465,77 +461,27 @@ def trivia_answer_post():
     )
 
 
-@app.post('/add_balance')
-@cookie_required
-def add_balance_post():
-
-    username = request.get_cookie("user")
-    user = auth.get_user_by_username(username)
-
-    try:
-
-        amount = float(
-            request.forms.get('amount')
-        )
-
-        trading_service.add_balance(
-            user.user_id,
-            amount
-        )
-
-        balance = trading_service.get_balance(
-            user.user_id
-        )
-
-        return template(
-            'add_balance',
-            user=username,
-            balance=balance,
-            question=None,
-            cooldown_remaining=None,
-            error=None,
-            success=(
-                f"Successfully added "
-                f"€{amount:.2f} to your balance."
-            )
-        )
-
-    except ValueError as e:
-
-        balance = trading_service.get_balance(
-            user.user_id
-        )
-
-        return template(
-            'add_balance',
-            user=username,
-            balance=balance,
-            question=None,
-            cooldown_remaining=None,
-            error=str(e),
-            success=None
-        )
-
-
 # =========================
 # LOGOUT
 # =========================
 
 @app.route('/logout', name='logout')
-def logout():
-
-    # Remove both user cookies
-    response.set_cookie(
-        "user",
-        "",
-        expires=0
+@cookie_required
+def logout_confirm():
+    return template(
+        'logout',
+        user=get_cookie("user"),
+        success=None,
+        error=None
     )
 
-    response.set_cookie(
-        "user_id",
-        "",
-        expires=0
-    )
+
+@app.post('/logout')
+def logout_post():
+    # POST only: with a GET route any prefetch or <img src="/logout"> would
+    # log the user out.
+    clear_cookie("user")
+    clear_cookie("user_id")
 
     return redirect('/login')
 

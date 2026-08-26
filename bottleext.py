@@ -54,6 +54,28 @@ def redirect(path='/'):
     bottle.redirect(absolute_url(path))
 
 
+# Signing key for the session cookie. Override it in binder/start or the
+# environment; the default is only here so the app runs straight after cloning.
+SECRET_KEY = os.environ.get('SECRET_KEY', 'zerorisk-trader-change-me')
+SESSION_MAX_AGE = 8 * 3600
+
+
+def set_cookie(name, value):
+    """Signed cookie. Bottle appends a keyed hash and checks it on read."""
+    response.set_cookie(name, str(value), secret=SECRET_KEY,
+                        path='/', max_age=SESSION_MAX_AGE, httponly=True)
+
+
+def get_cookie(name):
+    """Value, or None if the cookie is missing or has been tampered with."""
+    value = request.get_cookie(name, secret=SECRET_KEY)
+    return value if value else None       # bottle returns False on a bad signature
+
+
+def clear_cookie(name):
+    response.delete_cookie(name, secret=SECRET_KEY, path='/')
+
+
 def template(*args, **kwargs):
     kwargs.setdefault('url', url)
     kwargs.setdefault('path', bottle.request.path)

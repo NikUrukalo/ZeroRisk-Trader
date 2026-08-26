@@ -8,6 +8,10 @@ import subprocess
 import sys
 from pathlib import Path
 
+# What a brand new account starts with.
+STARTING_BALANCE = 1000.00
+
+
 class AuthService:
     repo: Repo
 
@@ -23,7 +27,7 @@ class AuthService:
         password_hash = bcrypt.hashpw(bytes_pw, salt).decode('utf-8')
 
         user_id = self.repo.insert_user(user_name, email, password_hash)
-        self.repo.insert_portfolio(user_id, 0)
+        self.repo.insert_portfolio(user_id, STARTING_BALANCE)
 
         return AppUserDto(user_id=user_id, user_name=user_name, email=email)
 
