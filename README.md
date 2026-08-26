@@ -1,13 +1,11 @@
 # ZeroRisk Trader
 
-A web application for practising stock, ETF and crypto trading with **virtual
+ZeroRisk Trader is a fun web application for practising stock, ETF and crypto trading with **virtual
 money**. Real market prices, a real relational database, and nothing at stake.
 
 Project for **Osnove podatkovnih baz** (FMF, 2026).
 
-**Authors:** Nejc Zibret and Nik Urukalo
-
-[![Binder](https://mybinder.org/badge_logo.svg)](https://mybinder.org/v2/gh/NikUrukalo/ZeroRisk-Trader/main?urlpath=proxy/8080/)
+**Authors:** Nejc Žibret and Nik Urukalo
 
 ---
 
