@@ -12,6 +12,8 @@ CREATE TABLE IF NOT EXISTS portfolio (
     portfolio_id SERIAL PRIMARY KEY,
     user_id INTEGER NOT NULL UNIQUE REFERENCES app_user(user_id) ON DELETE CASCADE, -- one portfolio per user
     virtual_balance NUMERIC(10, 2) NOT NULL CHECK (virtual_balance >= 0),
+    login_streak INTEGER NOT NULL DEFAULT 0,
+    last_bonus_on DATE,
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
 
@@ -57,6 +59,15 @@ CREATE TABLE IF NOT EXISTS trivia_question (
     option_d TEXT NOT NULL,
     correct_option CHAR(1) NOT NULL CHECK (correct_option IN ('A','B','C','D')),
     reward_amount NUMERIC(10, 2) NOT NULL DEFAULT 250.00
+);
+
+CREATE TABLE IF NOT EXISTS daily_bonus (
+    bonus_id SERIAL PRIMARY KEY,
+    portfolio_id INTEGER NOT NULL REFERENCES portfolio(portfolio_id) ON DELETE CASCADE,
+    bonus_date DATE NOT NULL DEFAULT CURRENT_DATE,
+    amount NUMERIC(10, 2) NOT NULL CHECK (amount > 0),
+    streak_day INTEGER NOT NULL CHECK (streak_day >= 1),
+    CONSTRAINT daily_bonus_once_per_day UNIQUE (portfolio_id, bonus_date) -- one bonus per day
 );
 
 CREATE TABLE IF NOT EXISTS trivia_attempt (

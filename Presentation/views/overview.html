@@ -1,121 +1,154 @@
 % rebase('base.html')
+% setdefault('streak', None)
 
-<div class="container py-4">
-    <div class="row justify-content-center">
-        <div class="col-12 col-lg-10">
+<div class="page">
 
-            <!-- Alerts -->
-            % if error:
-                <div class="alert alert-danger border-0 rounded-3 py-2 px-3 mb-4" role="alert">
-                    <div>{{error}}</div>
-                </div>
-            % end
+    <div class="page-head">
+        <div>
+            <h4>Account overview</h4>
+            <p class="page-sub">Your cash, your holdings and everything you have traded.</p>
+        </div>
+        <a class="btn btn-primary" href="{{ url('/trade') }}">Trade</a>
+    </div>
 
-            <h4 class="fw-bold mb-3">Account overview</h4>
+    % if error:
+        <div class="alert alert-danger mb-4">{{error}}</div>
+    % end
+    % if success:
+        <div class="alert alert-success mb-4">{{success}}</div>
+    % end
 
-            <div class="row g-3 mb-4">
-                <div class="col-md-4">
-                    <div class="stat-tile">
-                        <div class="stat-label">Cash balance</div>
-                        <div class="stat-value">{{'%.2f' % balance}} <small class="text-muted fs-6">EUR</small></div>
-                    </div>
-                </div>
-                <div class="col-md-4">
-                    <div class="stat-tile">
-                        <div class="stat-label">Holdings value</div>
-                        <div class="stat-value">{{'%.2f' % holdings_value}} <small class="text-muted fs-6">EUR</small></div>
-                    </div>
-                </div>
-                <div class="col-md-4">
-                    <div class="stat-tile accent">
-                        <div class="stat-label">Total value</div>
-                        <div class="stat-value">{{'%.2f' % total_value}} <small class="fs-6">EUR</small></div>
-                    </div>
-                </div>
+    <div class="row g-3 mb-4">
+        <div class="col-md-4">
+            <div class="stat-tile">
+                <div class="stat-label">Cash balance</div>
+                <div class="stat-value">{{'%.2f' % balance}} <small class="text-muted fs-6">EUR</small></div>
             </div>
-
-            <!-- Investments Card -->
-            <div class="card border-0 shadow-sm rounded-4 mb-4">
-                <div class="card-header bg-white border-bottom p-3">
-                    <h5 class="mb-0 fw-bold text-dark">Investments</h5>
-                </div>
-                <div class="card-body p-0">
-                    % if positions:
-                        <div class="table-responsive">
-                            <table class="table table-hover align-middle mb-0">
-                                <thead class="table-light">
-                                    <tr>
-                                        <th class="ps-4">Asset</th>
-                                        <th>Quantity</th>
-                                        <th>Avg Buy Price</th>
-                                        <th>Current Price</th>
-                                        <th>Value</th>
-                                        <th class="pe-4 text-end">Growth</th>
-                                    </tr>
-                                </thead>
-                                <tbody>
-                                    % for p in positions:
-                                    <tr>
-                                        <td class="ps-4"><span class="fw-bold text-dark">{{p['asset_name']}}</span> <span class="text-muted small">({{p['asset_symbol']}})</span></td>
-                                        <td>{{p['quantity']}}</td>
-                                        <td>{{'%.2f' % p['avg_buy_price']}} EUR</td>
-                                        <td>{{'%.2f' % p['current_price']}} EUR</td>
-                                        <td class="fw-semibold">{{'%.2f' % p['current_value']}} EUR</td>
-                                        <td class="pe-4 text-end fw-semibold {{'text-success' if p['growth_amount'] >= 0 else 'text-danger'}}">
-                                            {{'%.2f' % p['growth_amount']}} EUR ({{'%.2f' % p['growth_percent']}}%)
-                                        </td>
-                                    </tr>
-                                    % end
-                                </tbody>
-                            </table>
-                        </div>
-                    % else:
-                        <p class="text-center text-muted my-4 py-3">You don't have any open positions yet.</p>
-                    % end
-                </div>
+        </div>
+        <div class="col-md-4">
+            <div class="stat-tile">
+                <div class="stat-label">Holdings value</div>
+                <div class="stat-value">{{'%.2f' % holdings_value}} <small class="text-muted fs-6">EUR</small></div>
             </div>
-
-            <!-- Recent Trades Card -->
-            <div class="card border-0 shadow-sm rounded-4">
-                <div class="card-header bg-white border-bottom p-3">
-                    <h5 class="mb-0 fw-bold text-dark">Recent Trades</h5>
-                </div>
-                <div class="card-body p-0">
-                    % if trades:
-                        <div class="table-responsive">
-                            <table class="table table-hover align-middle mb-0">
-                                <thead class="table-light">
-                                    <tr>
-                                        <th class="ps-4">Asset</th>
-                                        <th>Order</th>
-                                        <th>Quantity</th>
-                                        <th>Price</th>
-                                        <th class="pe-4 text-end">Date</th>
-                                    </tr>
-                                </thead>
-                                <tbody>
-                                    % for t in trades:
-                                    <tr>
-                                        <td class="ps-4"><span class="fw-bold text-dark">{{t['asset_name']}}</span> <span class="text-muted small">({{t['asset_symbol']}})</span></td>
-                                        <td>
-                                            <span class="badge {{'bg-success-subtle text-success' if t['trade_type'] == 'BUY' else 'bg-danger-subtle text-danger'}} rounded-pill px-3">
-                                                {{t['trade_type']}}
-                                            </span>
-                                        </td>
-                                        <td>{{t['quantity']}}</td>
-                                        <td class="fw-semibold">{{'%.2f' % t['price']}} EUR</td>
-                                        <td class="pe-4 text-end text-muted small">{{t['created_at']}}</td>
-                                    </tr>
-                                    % end
-                                </tbody>
-                            </table>
-                        </div>
-                    % else:
-                        <p class="text-center text-muted my-4 py-3">No trades recorded yet.</p>
-                    % end
-                </div>
+        </div>
+        <div class="col-md-4">
+            <div class="stat-tile accent">
+                <div class="stat-label">Total value</div>
+                <div class="stat-value">{{'%.2f' % total_value}} <small class="fs-6">EUR</small></div>
             </div>
-
         </div>
     </div>
+
+    % if streak:
+    <div class="card mb-4">
+        <div class="card-header">
+            <h5>Login streak</h5>
+            <span class="card-note">{{streak['streak']}} day{{'' if streak['streak'] == 1 else 's'}} in a row</span>
+        </div>
+        <div class="card-body d-flex align-items-center justify-content-between flex-wrap gap-3">
+            <div class="streak-dots">
+                % for d in range(1, 8):
+                    <i class="{{'on' if d <= streak['dots'] else ''}}"></i>
+                % end
+            </div>
+            <div class="text-muted small">
+                % if streak['claimed_today']:
+                    Today's reward is already in your balance. Log in tomorrow for
+                    <strong>EUR {{'%.2f' % streak['next_amount']}}</strong>.
+                % else:
+                    Logging in today is worth <strong>EUR {{'%.2f' % streak['next_amount']}}</strong>.
+                % end
+                % if streak['days_to_milestone']:
+                    {{streak['days_to_milestone']}} more day(s) to the EUR 50.00 weekly milestone.
+                % end
+            </div>
+        </div>
+    </div>
+    % end
+
+    <div class="card mb-4">
+        <div class="card-header"><h5>Investments</h5></div>
+        <div class="card-body p-0">
+            % if positions:
+                <div class="table-responsive">
+                    <table class="table table-hover align-middle mb-0">
+                        <thead>
+                            <tr>
+                                <th>Asset</th>
+                                <th class="num">Quantity</th>
+                                <th class="num">Avg buy price</th>
+                                <th class="num">Current price</th>
+                                <th class="num">Value</th>
+                                <th class="num">Growth</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            % for p in positions:
+                            <tr>
+                                <td><span class="fw-semibold">{{p['asset_name']}}</span>
+                                    <span class="text-muted small">({{p['asset_symbol']}})</span></td>
+                                <td class="num">{{p['quantity']}}</td>
+                                <td class="num">{{'%.2f' % p['avg_buy_price']}}</td>
+                                <td class="num">{{'%.2f' % p['current_price']}}</td>
+                                <td class="num fw-semibold">{{'%.2f' % p['current_value']}}</td>
+                                <td class="num {{'text-success' if p['growth_amount'] >= 0 else 'text-danger'}}">
+                                    {{'%.2f' % p['growth_amount']}}
+                                    <span class="small">({{'%.2f' % p['growth_percent']}}%)</span>
+                                </td>
+                            </tr>
+                            % end
+                        </tbody>
+                    </table>
+                </div>
+            % else:
+                <div class="empty-state">
+                    You don't have any open positions yet.
+                    <a href="{{ url('/trade') }}">Buy your first asset</a>.
+                </div>
+            % end
+        </div>
+    </div>
+
+    <div class="card">
+        <div class="card-header">
+            <h5>Recent trades</h5>
+            <span class="card-note">last 10 orders</span>
+        </div>
+        <div class="card-body p-0">
+            % if trades:
+                <div class="table-responsive">
+                    <table class="table table-hover align-middle mb-0">
+                        <thead>
+                            <tr>
+                                <th>Asset</th>
+                                <th>Order</th>
+                                <th class="num">Quantity</th>
+                                <th class="num">Price</th>
+                                <th class="num">Date</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            % for t in trades:
+                            <tr>
+                                <td><span class="fw-semibold">{{t['asset_name']}}</span>
+                                    <span class="text-muted small">({{t['asset_symbol']}})</span></td>
+                                <td>
+                                    <span class="badge {{'bg-success-subtle text-success' if t['trade_type'] == 'BUY' else 'bg-danger-subtle text-danger'}} rounded-pill px-3">
+                                        {{t['trade_type']}}
+                                    </span>
+                                </td>
+                                <td class="num">{{t['quantity']}}</td>
+                                <td class="num">{{'%.2f' % t['price']}}</td>
+                                <td class="num text-muted small">{{t['created_at']}}</td>
+                            </tr>
+                            % end
+                        </tbody>
+                    </table>
+                </div>
+            % else:
+                <div class="empty-state">No trades recorded yet.</div>
+            % end
+        </div>
+    </div>
+
 </div>

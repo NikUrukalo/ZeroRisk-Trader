@@ -12,58 +12,76 @@ REFRESH_INTERVAL = int(os.environ.get('PRICE_REFRESH_SECONDS', 600))
 BATCH_SIZE = 40
 
 _lock = threading.Lock()
-_last_refresh = 0.0
+_last_success = 0.0
+_last_error = None
 _running = False
 
 
-def maybe_refresh(fetcher=None):
-    """
-    Start a price refresh in the background if one is due.
+def status():
+    """What the Trade page shows about the last refresh."""
+    with _lock:
+        return {
+            'running': _running,
+            'last_success': (datetime.fromtimestamp(_last_success)
+                             if _last_success else None),
+            'last_error': _last_error,
+        }
 
-    Returns immediately - the caller (the login page) never waits for it.
+
+def maybe_refresh(fetcher=None, force=False):
     """
-    global _last_refresh, _running
+    Start a refresh in the background if one is due.
+
+    Returns immediately - the page never waits for it. Only a *successful*
+    refresh resets the timer, so a failed attempt is retried on the next
+    visit instead of being blocked for the whole interval.
+    """
+    global _running
 
     with _lock:
-        if _running or (time.time() - _last_refresh) < REFRESH_INTERVAL:
+        if _running:
+            return False
+        if not force and (time.time() - _last_success) < REFRESH_INTERVAL:
             return False
         _running = True
-        _last_refresh = time.time()
 
     threading.Thread(target=_refresh, args=(fetcher,), daemon=True).start()
     return True
 
 
 def _refresh(fetcher=None):
-    global _running
+    global _running, _last_success, _last_error
+
+    error = None
+    stored = 0
 
     try:
-        # A separate Repo, because psycopg2 connections are not thread-safe
-        # and the request handlers are using the shared one.
+        # A separate Repo: psycopg2 connections are not thread-safe and the
+        # request handlers are using the shared one.
         repo = Repo()
         symbols = repo.get_all_asset_symbols()
 
         if not symbols:
-            print('[prices] asset_master is empty, nothing to refresh')
-            return
-
-        prices = (fetcher or fetch_prices)(symbols)
-        rows = _to_rows(prices)
-
-        if rows:
-            repo.insert_asset_prices(rows)
-            print(f'[prices] stored {len(rows)} prices')
+            error = 'asset_master is empty'
         else:
-            print('[prices] no usable prices returned')
+            rows = _to_rows((fetcher or fetch_prices)(symbols))
+            if rows:
+                repo.insert_asset_prices(rows)
+                stored = len(rows)
+            else:
+                error = 'no usable prices returned'
 
     except Exception as exc:
-        # A failed refresh must never take the site down; the previous
-        # snapshot stays in the database and the app keeps working.
-        print(f'[prices] refresh failed: {exc}')
+        error = f'{type(exc).__name__}: {exc}'
 
-    finally:
-        with _lock:
-            _running = False
+    with _lock:
+        _running = False
+        _last_error = error
+        if not error:
+            _last_success = time.time()
+
+    print('[prices] ' + (f'stored {stored} prices' if not error
+                         else f'failed: {error}'))
 
 
 def _to_rows(prices):
@@ -91,10 +109,15 @@ def fetch_prices(symbols):
 
     for start in range(0, len(symbols), BATCH_SIZE):
         batch = symbols[start:start + BATCH_SIZE]
-        data = yf.download(batch, period='1d', interval='1d',
-                           group_by='ticker', auto_adjust=True,
-                           progress=False, threads=True)
-        if data is None or data.empty:
+
+        # Intraday first. A daily bar only moves once a day, so asking for
+        # '1d' bars stored the same number on every refresh and the prices
+        # looked frozen. One-minute bars move while a market is open, and
+        # crypto moves around the clock.
+        data = _download(yf, batch, period='1d', interval='1m')
+        if data is None or getattr(data, 'empty', True):
+            data = _download(yf, batch, period='5d', interval='1d')
+        if data is None or getattr(data, 'empty', True):
             continue
 
         for symbol in batch:
@@ -104,6 +127,15 @@ def fetch_prices(symbols):
             prices[symbol] = float(closes.iloc[-1]) / rate
 
     return prices
+
+
+def _download(yf, tickers, period, interval):
+    try:
+        return yf.download(tickers, period=period, interval=interval,
+                           group_by='ticker', auto_adjust=True,
+                           progress=False, threads=True)
+    except Exception:
+        return None
 
 
 def _closes_for(frame, symbol):
@@ -123,6 +155,11 @@ def _closes_for(frame, symbol):
 
 
 def _usd_per_eur(yf):
-    data = yf.download('EURUSD=X', period='5d', progress=False)['Close'].dropna()
-    rate = float(data.iloc[-1])
-    return rate if rate > 0 else 1.0
+    data = _download(yf, 'EURUSD=X', period='5d', interval='1d')
+    closes = _closes_for(data, 'EURUSD=X') if data is not None else None
+    if closes is None or closes.empty:
+        raise RuntimeError('could not read the EUR/USD rate')
+    rate = float(closes.iloc[-1])
+    if rate <= 0:
+        raise RuntimeError('EUR/USD rate came back as zero')
+    return rate

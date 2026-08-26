@@ -1,159 +1,145 @@
 % rebase('base.html')
+% setdefault('prices', {})
+% last = prices.get('last_success')
 
-<div class="container py-4">
-    <div class="row justify-content-center">
-        <div class="col-12 col-lg-10">
+<div class="page">
 
-            <!-- Title & Search Header -->
-            <div class="d-flex flex-column flex-md-row align-items-md-center justify-content-between gap-3 mb-4">
-                <h3 class="fw-bold text-dark mb-0">Trade Market</h3>
-                <div class="w-100 w-md-auto" style="min-width: 280px;">
-                    <input
-                        type="text"
-                        id="assetSearch"
-                        class="form-control rounded-3 border shadow-sm px-3 py-2"
-                        placeholder="Search name or symbol..."
-                    >
-                </div>
-            </div>
-
-            <!-- Error Banner -->
-            % if error:
-                <div class="alert alert-danger border-0 rounded-3 py-2 px-3 mb-4" role="alert">
-                    {{error}}
-                </div>
-            % end
-            
-            <!-- Success Banner -->
-            % if success:
-                <div class="alert alert-success border-0 rounded-3 py-2 px-3 mb-4" role="alert">
-                    {{success}}
-                </div>
-            % end
-
-            <!-- Available Assets Card -->
-            <div class="card border-0 shadow-sm rounded-4 mb-4 overflow-hidden">
-                <div class="card-header bg-white border-bottom p-3 d-flex align-items-center justify-content-between">
-                    <h5 class="mb-0 fw-bold text-dark">Available Assets</h5>
-                    <span class="badge bg-secondary-subtle text-secondary rounded-pill px-3">Live Prices</span>
-                </div>
-
-                <div class="card-body p-0">
-                    <div style="max-height: 480px; overflow-y: auto;">
-                        <table class="table table-hover align-middle mb-0" id="assetsTable">
-                            <thead class="table-light sticky-top shadow-sm">
-                                <tr>
-                                    <th class="ps-4">Asset</th>
-                                    <th>Symbol</th>
-                                    <th>Type</th>
-                                    <th>Price</th>
-                                    <th class="pe-4 text-end">Action</th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                                % for asset in assets:
-                                <tr>
-                                    <td class="ps-4 fw-bold text-dark asset-name">{{asset.asset_name}}</td>
-                                    <td class="asset-symbol"><span class="badge bg-light text-dark border">{{asset.asset_symbol}}</span></td>
-                                    <td><span class="text-muted small">{{asset.asset_type}}</span></td>
-                                    <td class="fw-semibold">{{asset.price}}</td>
-                                    <td class="pe-4">
-                                        <div class="d-flex gap-2 justify-content-end">
-                                            <!-- BUY FORM -->
-                                            <form action="{{ url('/trade/buy') }}" method="POST" class="d-flex gap-1">
-                                                <input type="hidden" name="asset_symbol" value="{{asset.asset_symbol}}">
-                                                <input
-                                                    type="number"
-                                                    name="quantity"
-                                                    min="0.000001"
-                                                    step="any"
-                                                    placeholder="Qty"
-                                                    class="form-control form-control-sm rounded-2"
-                                                    style="width: 80px;"
-                                                    required
-                                                >
-                                                <button type="submit" class="btn btn-sm btn-success rounded-2 px-3 fw-bold">Buy</button>
-                                            </form>
-
-                                            <!-- SELL FORM -->
-                                            <form action="{{ url('/trade/sell') }}" method="POST" class="d-flex gap-1">
-                                                <input type="hidden" name="asset_symbol" value="{{asset.asset_symbol}}">
-                                                <input
-                                                    type="number"
-                                                    name="quantity"
-                                                    min="0.000001"
-                                                    step="any"
-                                                    placeholder="Qty"
-                                                    class="form-control form-control-sm rounded-2"
-                                                    style="width: 80px;"
-                                                    required
-                                                >
-                                                <button type="submit" class="btn btn-sm btn-outline-danger rounded-2 px-3 fw-bold">Sell</button>
-                                            </form>
-                                        </div>
-                                    </td>
-                                </tr>
-                                % end
-                            </tbody>
-                        </table>
-                    </div>
-                </div>
-            </div>
-
-            <!-- Top 5 Movers Card -->
-            <div class="card border-0 shadow-sm rounded-4">
-                <div class="card-header bg-white border-bottom p-3">
-                    <h5 class="mb-0 fw-bold text-dark">Top 5 Movers</h5>
-                </div>
-                <div class="card-body p-0">
-                    <div class="table-responsive">
-                        <table class="table table-hover align-middle mb-0">
-                            <thead class="table-light">
-                                <tr>
-                                    <th class="ps-4">Asset</th>
-                                    <th>Symbol</th>
-                                    <th>Previous Price</th>
-                                    <th>Current Price</th>
-                                    <th class="pe-4 text-end">24h Movement</th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                                % for mover in top_movers:
-                                <tr>
-                                    <td class="ps-4 fw-bold text-dark">{{mover["asset_name"]}}</td>
-                                    <td><span class="badge bg-light text-dark border">{{mover["asset_symbol"]}}</span></td>
-                                    <td class="text-muted">{{mover["previous_price"]}}</td>
-                                    <td class="fw-semibold">{{mover["price"]}}</td>
-                                    <td class="pe-4 text-end fw-semibold">
-                                        % if mover["movement"] >= 0:
-                                            <span class="badge bg-success-subtle text-success rounded-pill px-3 py-1">
-                                                ▲ +{{"%.2f" % mover["movement"]}}%
-                                            </span>
-                                        % else:
-                                            <span class="badge bg-danger-subtle text-danger rounded-pill px-3 py-1">
-                                                ▼ {{"%.2f" % mover["movement"]}}%
-                                            </span>
-                                        % end
-                                    </td>
-                                </tr>
-                                % end
-                            </tbody>
-                        </table>
-                    </div>
-                </div>
-            </div>
-
+    <div class="page-head">
+        <div>
+            <h4>Trade market</h4>
+            <p class="page-sub">Buy or sell any quantity at the latest stored price.</p>
+        </div>
+        <div class="d-flex align-items-center gap-2">
+            <input type="text" id="assetSearch" class="form-control search-box"
+                   placeholder="Search name or symbol...">
+            <form method="POST" action="{{ url('/prices/refresh') }}" class="m-0">
+                <button type="submit" class="btn btn-primary">Refresh prices</button>
+            </form>
         </div>
     </div>
+
+    % if error:
+        <div class="alert alert-danger mb-4">{{error}}</div>
+    % end
+    % if success:
+        <div class="alert alert-success mb-4">{{success}}</div>
+    % end
+    % if prices.get('last_error') and not last:
+        <div class="alert alert-danger mb-4">Last price update failed: {{prices['last_error']}}</div>
+    % end
+
+    <div class="card mb-4">
+        <div class="card-header">
+            <h5>Available assets</h5>
+            <span class="card-note">
+                % if prices.get('running'):
+                    Updating prices...
+                % elif last:
+                    Prices from {{last.strftime('%d.%m.%Y %H:%M')}}
+                % else:
+                    Prices from the last stored snapshot
+                % end
+            </span>
+        </div>
+
+        <div class="card-body p-0">
+            <div style="max-height: 480px; overflow-y: auto;">
+                <table class="table table-hover align-middle mb-0" id="assetsTable">
+                    <thead class="sticky-top">
+                        <tr>
+                            <th>Asset</th>
+                            <th>Symbol</th>
+                            <th>Type</th>
+                            <th class="num">Price</th>
+                            <th class="text-end">Order</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        % for asset in assets:
+                        <tr>
+                            <td class="fw-semibold asset-name">{{asset.asset_name}}</td>
+                            <td class="asset-symbol"><span class="badge bg-light text-dark border">{{asset.asset_symbol}}</span></td>
+                            <td><span class="text-muted small">{{asset.asset_type}}</span></td>
+                            <td class="num fw-semibold">{{'%.2f' % asset.price}}</td>
+                            <td>
+                                <div class="d-flex gap-2 justify-content-end">
+                                    <form action="{{ url('/trade/buy') }}" method="POST" class="d-flex gap-1">
+                                        <input type="hidden" name="asset_symbol" value="{{asset.asset_symbol}}">
+                                        <input type="text" inputmode="decimal" name="quantity"
+                                               placeholder="Qty" class="form-control form-control-sm"
+                                               style="width: 78px;" required>
+                                        <button type="submit" class="btn btn-sm btn-success px-3">Buy</button>
+                                    </form>
+
+                                    <form action="{{ url('/trade/sell') }}" method="POST" class="d-flex gap-1">
+                                        <input type="hidden" name="asset_symbol" value="{{asset.asset_symbol}}">
+                                        <input type="text" inputmode="decimal" name="quantity"
+                                               placeholder="Qty" class="form-control form-control-sm"
+                                               style="width: 78px;" required>
+                                        <button type="submit" class="btn btn-sm btn-outline-danger px-3">Sell</button>
+                                    </form>
+                                </div>
+                            </td>
+                        </tr>
+                        % end
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+
+    <div class="card">
+        <div class="card-header">
+            <h5>Top 5 movers</h5>
+            <span class="card-note">change since the previous snapshot</span>
+        </div>
+        <div class="card-body p-0">
+            % if top_movers:
+                <div class="table-responsive">
+                    <table class="table table-hover align-middle mb-0">
+                        <thead>
+                            <tr>
+                                <th>Asset</th>
+                                <th>Symbol</th>
+                                <th class="num">Previous</th>
+                                <th class="num">Current</th>
+                                <th class="num">Change</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            % for mover in top_movers:
+                            <tr>
+                                <td class="fw-semibold">{{mover["asset_name"]}}</td>
+                                <td><span class="badge bg-light text-dark border">{{mover["asset_symbol"]}}</span></td>
+                                <td class="num text-muted">{{'%.2f' % mover["previous_price"]}}</td>
+                                <td class="num fw-semibold">{{'%.2f' % mover["price"]}}</td>
+                                <td class="num">
+                                    % if mover["movement"] >= 0:
+                                        <span class="badge bg-success-subtle text-success rounded-pill px-3">▲ +{{"%.2f" % mover["movement"]}}%</span>
+                                    % else:
+                                        <span class="badge bg-danger-subtle text-danger rounded-pill px-3">▼ {{"%.2f" % mover["movement"]}}%</span>
+                                    % end
+                                </td>
+                            </tr>
+                            % end
+                        </tbody>
+                    </table>
+                </div>
+            % else:
+                <div class="empty-state">
+                    Movers need at least two price snapshots. Press
+                    <strong>Refresh prices</strong> and come back in a few minutes.
+                </div>
+            % end
+        </div>
+    </div>
+
 </div>
 
-<!-- Live Filter Script -->
 <script>
-document.getElementById("assetSearch").addEventListener("keyup", function() {
+document.getElementById("assetSearch").addEventListener("keyup", function () {
     const search = this.value.toLowerCase();
-    const rows = document.querySelectorAll("#assetsTable tbody tr");
-
-    rows.forEach(function(row) {
+    document.querySelectorAll("#assetsTable tbody tr").forEach(function (row) {
         const name = row.querySelector(".asset-name").textContent.toLowerCase();
         const symbol = row.querySelector(".asset-symbol").textContent.toLowerCase();
         row.style.display = (name.includes(search) || symbol.includes(search)) ? "" : "none";

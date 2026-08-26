@@ -20,11 +20,13 @@ import psycopg2
 from Services.auth_service import AuthService
 from Services.trading_services import TradingService
 from Services import price_service
+from Services.streak_service import StreakService
 
 
 # Setting up the app
 trading_service = TradingService()
 auth = AuthService()
+streaks = StreakService()
 
 bottle.TEMPLATE_PATH.insert(0, 'Presentation/views/')
 app = Bottle()
@@ -109,6 +111,10 @@ def login_post():
     if log_in:
         set_cookie("user", username)
         set_cookie("user_id", log_in.user_id)
+
+        message = streaks.claim(log_in.user_id)
+        if message:
+            set_cookie("flash", message)
 
         # auth.refresh_assets()
 
@@ -214,11 +220,17 @@ def overview():
         user.user_id
     )
 
+    # One-shot message from the login redirect (the streak reward).
+    message = get_cookie("flash")
+    if message:
+        clear_cookie("flash")
+
     return template(
         'overview',
         user=username,
-        success=None,
+        success=message,
         error=None,
+        streak=streaks.status(user.user_id),
         **data
     )
 
@@ -242,6 +254,7 @@ def trade():
         user=username,
         assets=assets,
         top_movers=top_movers,
+        prices=price_service.status(),
         error=None,
         success=None
     )
@@ -276,6 +289,7 @@ def trade_buy():
             user=username,
             assets=assets,
             top_movers=top_movers,
+            prices=price_service.status(),
             error=None,
             success=message
         )
@@ -287,6 +301,7 @@ def trade_buy():
             user=username,
             assets=assets,
             top_movers=top_movers,
+            prices=price_service.status(),
             error=str(e),
             success=None
         )
@@ -321,6 +336,7 @@ def trade_sell():
             user=username,
             assets=assets,
             top_movers=top_movers,
+            prices=price_service.status(),
             error=None,
             success=message
         )
@@ -332,9 +348,17 @@ def trade_sell():
             user=username,
             assets=assets,
             top_movers=top_movers,
+            prices=price_service.status(),
             error=str(e),
             success=None
         )
+
+
+@app.post('/prices/refresh')
+@cookie_required
+def prices_refresh():
+    price_service.maybe_refresh(force=True)
+    return redirect('/trade')
 
 
 # =========================

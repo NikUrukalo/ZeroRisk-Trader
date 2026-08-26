@@ -52,7 +52,7 @@ h1, h2, h3, h4, h5 { color: var(--navy-900); letter-spacing: -.01em; }
     gap: .5rem;
 }
 
-.navbar-brand img { height: 26px; }
+.navbar-brand span { color: #7aabe8; }
 
 /* The old rules were scoped to `.navbar.bg-navy`, but the navbar's class is
    `navigation-navy`, so nothing matched and Bootstrap's dim default
@@ -275,3 +275,49 @@ h1, h2, h3, h4, h5 { color: var(--navy-900); letter-spacing: -.01em; }
     font-size: .84rem;
     color: var(--gray-500);
 }
+
+/* ------------------------------------------------- shared page furniture */
+
+.page { max-width: 1060px; margin: 0 auto; }
+
+.page-head {
+    display: flex;
+    align-items: flex-end;
+    justify-content: space-between;
+    gap: 1rem;
+    flex-wrap: wrap;
+    margin-bottom: 1.25rem;
+}
+
+.page-head h4 { margin: 0; font-weight: 700; }
+.page-head .page-sub { margin: .15rem 0 0; color: var(--gray-500); font-size: .88rem; }
+
+.card-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: .75rem;
+    padding: .8rem 1.1rem;
+}
+
+.card-header h5 { margin: 0; font-size: .98rem; font-weight: 600; }
+
+.card-note {
+    font-size: .78rem;
+    color: var(--gray-500);
+    font-weight: 500;
+    white-space: nowrap;
+}
+
+.search-box { width: 240px; max-width: 100%; }
+
+.empty-state {
+    padding: 2.2rem 1rem;
+    text-align: center;
+    color: var(--gray-500);
+}
+
+/* streak card */
+.streak-dots { display: flex; gap: .3rem; }
+.streak-dots i { width: 20px; height: 20px; border-radius: 6px; background: var(--gray-200); }
+.streak-dots i.on { background: var(--navy-600); }

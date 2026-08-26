@@ -43,3 +43,19 @@ CREATE INDEX IF NOT EXISTS trade_portfolio_idx
     ON trade (portfolio_id, created_at DESC);
 CREATE INDEX IF NOT EXISTS position_portfolio_idx
     ON position (portfolio_id);
+
+-- 5. Daily login streak reward.
+ALTER TABLE portfolio
+    ADD COLUMN IF NOT EXISTS login_streak  INTEGER NOT NULL DEFAULT 0,
+    ADD COLUMN IF NOT EXISTS last_bonus_on DATE;
+
+CREATE TABLE IF NOT EXISTS daily_bonus (
+    bonus_id     SERIAL PRIMARY KEY,
+    portfolio_id INTEGER NOT NULL REFERENCES portfolio(portfolio_id) ON DELETE CASCADE,
+    bonus_date   DATE NOT NULL DEFAULT CURRENT_DATE,
+    amount       NUMERIC(10, 2) NOT NULL CHECK (amount > 0),
+    streak_day   INTEGER NOT NULL CHECK (streak_day >= 1),
+    -- This is the whole anti-double-claim mechanism: even ten logins in the
+    -- same second can only ever insert one row for today.
+    CONSTRAINT daily_bonus_once_per_day UNIQUE (portfolio_id, bonus_date)
+);

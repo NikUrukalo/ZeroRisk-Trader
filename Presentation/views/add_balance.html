@@ -1,97 +1,78 @@
 % rebase('base.html')
 
-<div class="container py-4">
-    <div class="row justify-content-center">
-        <div class="col-12 col-md-10 col-lg-7">
-            
-            <div class="card border-0 shadow-sm rounded-4 overflow-hidden">
-                
-                <!-- Card Header -->
-                <div class="card-header bg-white border-bottom p-3 d-flex align-items-center justify-content-between">
-                    <h5 class="mb-0 fw-bold text-dark">Earn Balance</h5>
-                    <span class="badge bg-primary-subtle text-primary rounded-pill px-3 py-1">Trivia</span>
-                </div>
+<div class="page">
 
-                <!-- Card Body -->
-                <div class="card-body p-4">
+    <div class="page-head">
+        <div>
+            <h4>Earn balance</h4>
+            <p class="page-sub">Answer a finance question to add virtual money to your account.</p>
+        </div>
+        <a class="btn btn-primary" href="{{ url('/overview') }}">Back to overview</a>
+    </div>
 
-                    <!-- Alerts -->
-                    % if error:
-                        <div class="alert alert-danger border-0 rounded-3 py-2 px-3 mb-3 d-flex align-items-center" role="alert">
-                            <div>{{error}}</div>
-                        </div>
-                    % end
+    % if error:
+        <div class="alert alert-danger mb-4">{{error}}</div>
+    % end
+    % if success:
+        <div class="alert alert-success mb-4">{{success}}</div>
+    % end
 
-                    % if success:
-                        <div class="alert alert-success border-0 rounded-3 py-2 px-3 mb-3 d-flex align-items-center" role="alert">
-                            <div>{{success}}</div>
-                        </div>
-                    % end
+    <div class="row g-3 mb-4">
+        <div class="col-md-6">
+            <div class="stat-tile accent">
+                <div class="stat-label">Current balance</div>
+                <div class="stat-value">{{"%.2f" % balance}} <small class="fs-6">EUR</small></div>
+            </div>
+        </div>
+        % if question:
+        <div class="col-md-6">
+            <div class="stat-tile">
+                <div class="stat-label">Reward for this question</div>
+                <div class="stat-value">{{"%.2f" % question['reward_amount']}} <small class="text-muted fs-6">EUR</small></div>
+            </div>
+        </div>
+        % end
+    </div>
 
-                    <!-- Balance Banner -->
-                    <div class="bg-light rounded-4 p-3 mb-4 text-center border">
-                        <span class="text-muted small fw-medium text-uppercase tracking-wider">Current Balance</span>
-                        <h2 class="fw-bold mb-0 text-dark mt-1">
-                            €{{"%.2f" % balance}}
-                        </h2>
+    <div class="card">
+        <div class="card-header">
+            <h5>Finance quiz</h5>
+            <span class="card-note">one question per hour</span>
+        </div>
+        <div class="card-body">
+
+            % if question:
+                <p class="fs-5 fw-semibold mb-4">{{question['question_text']}}</p>
+
+                <form action="{{ url('/trivia/answer') }}" method="POST">
+                    <input type="hidden" name="question_id" value="{{question['question_id']}}">
+
+                    <div class="d-grid gap-2 mb-4">
+                        % for opt in ['a', 'b', 'c', 'd']:
+                            <div class="position-relative">
+                                <input type="radio" class="btn-check" name="submitted_option"
+                                       id="option_{{opt}}" value="{{opt.upper()}}" autocomplete="off">
+                                <label class="option-label" for="option_{{opt}}">
+                                    <span class="option-prefix">{{opt.upper()}}</span>
+                                    <span>{{question['option_' + opt]}}</span>
+                                </label>
+                            </div>
+                        % end
                     </div>
 
-                    <!-- Question Content -->
-                    % if question:
-                        <div class="d-flex align-items-center justify-content-between mb-3">
-                            <span class="badge bg-success-subtle text-success rounded-pill px-3 py-2 fw-semibold">
-                                Reward: +€{{"%.2f" % question['reward_amount']}}
-                            </span>
-                        </div>
+                    <button type="submit" class="btn btn-primary w-100 py-2">Submit answer</button>
+                </form>
 
-                        <form action="{{ url('/trivia/answer') }}" method="POST">
-                            <input type="hidden" name="question_id" value="{{question['question_id']}}">
-
-                            <div class="mb-3">
-                                <p class="fw-medium text-dark mb-0 fs-5">
-                                    {{question['question_text']}}
-                                </p>
-                            </div>
-
-                            <!-- Options List -->
-                            <div class="d-grid gap-2 mb-4">
-                                % for opt in ['a', 'b', 'c', 'd']:
-                                    <div class="position-relative">
-                                        <input 
-                                            type="radio" 
-                                            class="btn-check" 
-                                            name="submitted_option" 
-                                            id="option_{{opt}}" 
-                                            value="{{opt.upper()}}" 
-                                            autocomplete="off" 
-                                            required
-                                        >
-                                        <label class="option-label" for="option_{{opt}}">
-                                            <span class="option-prefix">{{opt.upper()}}</span>
-                                            <span>{{question['option_' + opt]}}</span>
-                                        </label>
-                                    </div>
-                                % end
-                            </div>
-
-                            <button type="submit" class="btn btn-primary w-100 py-2.5 rounded-3 fw-bold">
-                                Submit Answer
-                            </button>
-                        </form>
-
-                    <!-- Cooldown State -->
-                    % elif cooldown_remaining:
-                        <div class="text-center py-4 bg-light rounded-4 border border-dashed">
-                            <h6 class="fw-bold mb-1 text-dark">Cooldown Active</h6>
-                            <p class="mb-0 text-muted small">
-                                You can try another question in <span class="fw-bold text-dark">{{cooldown_remaining}} minutes</span>.
-                            </p>
-                        </div>
-                    % end
-
+            % elif cooldown_remaining:
+                <div class="empty-state">
+                    <div class="fw-semibold text-dark mb-1">Cooldown active</div>
+                    You can try another question in <strong>{{cooldown_remaining}} minutes</strong>.
                 </div>
-            </div>
+            % else:
+                <div class="empty-state">No question available right now.</div>
+            % end
 
         </div>
     </div>
+
 </div>

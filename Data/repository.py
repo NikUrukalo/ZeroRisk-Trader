@@ -320,6 +320,61 @@ class Repo:
         self.conn.commit()
 
 
+    # daily login streak
+
+    def get_streak_state(self, portfolio_id: int) -> dict:
+        """
+        Streak info measured by the DATABASE clock, so a user in another
+        timezone (or an app running in UTC on Binder) cannot shift the day.
+        """
+        self._run("""
+            SELECT login_streak,
+                   last_bonus_on,
+                   (last_bonus_on = CURRENT_DATE)     AS claimed_today,
+                   (last_bonus_on = CURRENT_DATE - 1) AS streak_alive
+            FROM   portfolio
+            WHERE  portfolio_id = %s
+        """, (portfolio_id,))
+
+        row = self.cur.fetchone()
+        if row is None:
+            return {'login_streak': 0, 'last_bonus_on': None,
+                    'claimed_today': False, 'streak_alive': False}
+
+        return {'login_streak': row['login_streak'] or 0,
+                'last_bonus_on': row['last_bonus_on'],
+                'claimed_today': bool(row['claimed_today']),
+                'streak_alive': bool(row['streak_alive'])}
+
+    def award_daily_bonus(self, portfolio_id: int, amount, streak_day: int):
+        """
+        Pay today's bonus, or return None if it was already paid.
+
+        ON CONFLICT DO NOTHING plus the UNIQUE (portfolio_id, bonus_date)
+        constraint is what makes this safe: a second login in the same second
+        inserts nothing, so nobody is paid twice.
+        """
+        with self.transaction() as cur:
+            cur.execute("""
+                INSERT INTO daily_bonus (portfolio_id, bonus_date, amount, streak_day)
+                VALUES (%s, CURRENT_DATE, %s, %s)
+                ON CONFLICT (portfolio_id, bonus_date) DO NOTHING
+            """, (portfolio_id, amount, streak_day))
+
+            if cur.rowcount == 0:
+                return None
+
+            cur.execute("""
+                UPDATE portfolio
+                SET    virtual_balance = virtual_balance + %s,
+                       login_streak    = %s,
+                       last_bonus_on   = CURRENT_DATE
+                WHERE  portfolio_id = %s
+                RETURNING virtual_balance
+            """, (amount, streak_day, portfolio_id))
+
+            return cur.fetchone()['virtual_balance']
+
     # positions + prices in one query, and atomic buy / sell
 
     def get_positions_with_prices(self, portfolio_id: int) -> List[dict]:
