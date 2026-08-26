@@ -68,6 +68,8 @@
                     <div class="fw-semibold text-dark mb-1">Cooldown active</div>
                     You can try another question in <strong>{{cooldown_remaining}} minutes</strong>.
                 </div>
+            % elif error:
+                <div class="empty-state">The quiz could not be loaded.</div>
             % else:
                 <div class="empty-state">No question available right now.</div>
             % end

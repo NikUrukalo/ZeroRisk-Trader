@@ -15,7 +15,10 @@ from bottleext import (
     clear_cookie
 )
 from functools import wraps
+import traceback
+
 import psycopg2
+import psycopg2.errors
 
 from Services.auth_service import AuthService
 from Services.trading_services import TradingService
@@ -68,6 +71,28 @@ def parse_quantity(raw):
         raise ValueError("Quantity must be greater than zero.")
 
     return quantity
+
+
+def quiz_error(exc):
+    """
+    Turn a database failure on the quiz page into something readable.
+
+    Without this the page returns a blank "Internal Server Error" and the only
+    clue is in the log. The traceback still goes to /tmp/zerorisk.log.
+    """
+    traceback.print_exc()
+
+    if isinstance(exc, psycopg2.errors.InsufficientPrivilege):
+        return ("The database account the app uses may not read the quiz "
+                "tables. Run Data/grants.sql on the database, as the owner "
+                "of those tables.")
+
+    if isinstance(exc, psycopg2.errors.UndefinedTable):
+        return ("The quiz tables are missing. Run Data/create_database.sql "
+                "and Data/trivia_questions.sql on the database.")
+
+    return ("The quiz is unavailable right now. The reason is in "
+            "/tmp/zerorisk.log.")
 
 
 # Static files
@@ -378,6 +403,7 @@ def add_balance_get():
 
     question = None
     cooldown_remaining = None
+    error = None
 
     try:
 
@@ -387,12 +413,24 @@ def add_balance_get():
 
     except ValueError:
 
-        cooldown_remaining = (
-            trading_service
-            .get_trivia_cooldown_remaining(
-                user.user_id
+        # on cooldown, or no questions in the table
+        try:
+
+            cooldown_remaining = (
+                trading_service
+                .get_trivia_cooldown_remaining(
+                    user.user_id
+                )
             )
-        )
+
+        except Exception as exc:
+            error = quiz_error(exc)
+
+    except Exception as exc:
+
+        # anything that is not a ValueError used to escape this route and
+        # turn the whole page into a 500, so it never loaded at all
+        error = quiz_error(exc)
 
     return template(
         'add_balance',
@@ -400,7 +438,7 @@ def add_balance_get():
         balance=balance,
         question=question,
         cooldown_remaining=cooldown_remaining,
-        error=None,
+        error=error,
         success=None
     )
 
@@ -463,12 +501,21 @@ def trivia_answer_post():
 
         error = str(e)
 
-        cooldown_remaining = (
-            trading_service
-            .get_trivia_cooldown_remaining(
-                user.user_id
+        try:
+
+            cooldown_remaining = (
+                trading_service
+                .get_trivia_cooldown_remaining(
+                    user.user_id
+                )
             )
-        )
+
+        except Exception as exc:
+            error = quiz_error(exc)
+
+    except Exception as exc:
+
+        error = quiz_error(exc)
 
     balance = trading_service.get_balance(
         user.user_id
