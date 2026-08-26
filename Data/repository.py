@@ -101,20 +101,33 @@ class Repo:
 
     def get_all_assets(self) -> List[Asset]: # a list where every element is an Asset object
         self.cur.execute("""
-            SELECT a.asset_id, m.asset_name, a.asset_symbol, m.asset_type,
+            SELECT DISTINCT ON (a.asset_symbol)
+                   a.asset_id, m.asset_name, a.asset_symbol, m.asset_type,
                    a.price, a.date_stamp, a.time_stamp
             FROM asset a
             JOIN asset_master m ON a.asset_symbol = m.asset_symbol
-            WHERE (a.date_stamp, a.time_stamp) = (
-                SELECT date_stamp, time_stamp
-                FROM asset
-                ORDER BY date_stamp DESC, time_stamp DESC
-                LIMIT 1
-            )
+            ORDER BY a.asset_symbol, a.date_stamp DESC, a.time_stamp DESC
         """)
 
         dictionary = self.cur.fetchall()
         return [Asset.from_dict(a) for a in dictionary]
+
+    def get_all_asset_symbols(self) -> List[str]:
+        self.cur.execute("SELECT asset_symbol FROM asset_master ORDER BY asset_symbol")
+        return [row['asset_symbol'] for row in self.cur.fetchall()]
+
+    def insert_asset_prices(self, rows) -> int:
+        """Insert one price snapshot. rows = [(symbol, price, date, time), ...]"""
+        if not rows:
+            return 0
+
+        psycopg2.extras.execute_values(self.cur, """
+            INSERT INTO asset (asset_symbol, price, date_stamp, time_stamp)
+            VALUES %s
+        """, rows)
+
+        self.conn.commit()
+        return len(rows)
 
     def get_latest_price(self, asset_symbol: str) -> Optional[float]:
         self.cur.execute("""

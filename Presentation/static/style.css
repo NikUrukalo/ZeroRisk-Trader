@@ -1,184 +1,277 @@
-.navbar-brand {
-    font-weight: 800;
-    letter-spacing: -0.04em;
+/* ZeroRisk Trader - navy & gray theme on top of Bootstrap 5 */
+
+:root {
+    --navy-900: #0a1c33;
+    --navy-800: #0f2947;
+    --navy-700: #16385e;
+    --navy-600: #1d4b80;
+    --navy-500: #2a63a3;
+    --navy-100: #e4ecf6;
+
+    --gray-50:  #f6f8fa;
+    --gray-100: #eef1f5;
+    --gray-200: #dfe4ec;
+    --gray-300: #c8d0dc;
+    --gray-500: #74808f;
+    --gray-700: #3c4655;
+    --gray-800: #2b3442;
+
+    --up:        #1a7f5a;
+    --up-soft:   #e6f4ee;
+    --down:      #b0332c;
+    --down-soft: #fbeceb;
+
+    --radius: 12px;
+    --shadow: 0 1px 2px rgba(10, 28, 51, .06), 0 6px 20px rgba(10, 28, 51, .07);
+    --mono: "SFMono-Regular", Consolas, "Liberation Mono", monospace;
 }
+
+body {
+    background: var(--gray-50);
+    color: var(--gray-800);
+    font-size: 15px;
+}
+
+h1, h2, h3, h4, h5 { color: var(--navy-900); letter-spacing: -.01em; }
+
+/* ---------------------------------------------------------------- navbar */
 
 .navigation-navy {
-    background-color: #001e63;
+    background: linear-gradient(100deg, var(--navy-900), var(--navy-700));
+    box-shadow: var(--shadow);
+    padding-top: .55rem;
+    padding-bottom: .55rem;
 }
 
-.navbar.bg-navy .nav-link {
-    color: rgba(255, 255, 255, 0.85);
-}
-
-.navbar.bg-navy .nav-link:hover {
-    color: #ffffff;
-}
-
-/* Alert Boxes */
-.alert {
-    border: none;
-    border-radius: 0.75rem;
-    padding: 0.9rem 1.1rem;
-    font-weight: 500;
-    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+.navbar-brand {
+    font-weight: 800;
+    letter-spacing: -.04em;
+    color: #fff !important;
     display: flex;
     align-items: center;
-    gap: 0.6rem;
+    gap: .5rem;
 }
 
-.alert-danger {
-    background-color: #fdecea;
-    color: #b3261e;
-    border-left: 4px solid #b3261e;
+.navbar-brand img { height: 26px; }
+
+/* The old rules were scoped to `.navbar.bg-navy`, but the navbar's class is
+   `navigation-navy`, so nothing matched and Bootstrap's dim default
+   (rgba(255,255,255,.55)) stayed - hence the barely-readable links. */
+.navigation-navy .navbar-nav { gap: .15rem; }
+
+.navigation-navy .nav-link {
+    color: rgba(255, 255, 255, .82) !important;
+    font-weight: 500;
+    padding: .4rem .8rem !important;
+    border-radius: 8px;
+    transition: background-color .15s ease, color .15s ease;
 }
 
-.alert-success {
-    background-color: #e8f5e9;
-    color: #1e7e34;
-    border-left: 4px solid #1e7e34;
+.navigation-navy .nav-link:hover,
+.navigation-navy .nav-link:focus {
+    color: #fff !important;
+    background: rgba(255, 255, 255, .12);
 }
 
-/* Primary Buttons */
-.btn-primary,
-.submit-btn {
-    background-color: #0A2F7A !important;
-    border-color: #0A2F7A !important;
+.navigation-navy .nav-link.active {
+    color: #fff !important;
+    background: rgba(255, 255, 255, .2);
+}
+
+/* --------------------------------------------------------------- surfaces */
+
+.card {
+    border: 1px solid var(--gray-200);
+    border-radius: var(--radius);
+    box-shadow: var(--shadow);
+}
+
+.card-header {
+    background: #fff;
+    border-bottom: 1px solid var(--gray-200);
     font-weight: 600;
-    color: #ffffff !important;
-    width: 100%;
-    padding: 0.875rem !important;
-    border-radius: 0.5rem !important;
-    box-shadow: 0 2px 8px rgba(10, 47, 122, 0.2);
-    transition: background-color 0.2s ease, border-color 0.2s ease;
+}
+
+.table > :not(caption) > * > * { padding: .7rem .9rem; }
+
+.table thead th {
+    font-size: .72rem;
+    letter-spacing: .07em;
+    text-transform: uppercase;
+    color: var(--gray-500);
+    font-weight: 600;
+    background: var(--gray-50);
+    border-bottom: 1px solid var(--gray-200);
+    white-space: nowrap;
+}
+
+.table tbody tr:hover { background: var(--gray-50); }
+
+.num, .table td.num, .table th.num {
+    font-family: var(--mono);
+    font-variant-numeric: tabular-nums;
+}
+
+/* ---------------------------------------------------------------- alerts */
+
+.alert {
+    border: none;
+    border-radius: 10px;
+    padding: .85rem 1.05rem;
+    font-weight: 500;
+    box-shadow: var(--shadow);
+    display: flex;
+    align-items: center;
+    gap: .6rem;
+}
+
+.alert-danger  { background: var(--down-soft); color: #8c2721; border-left: 4px solid var(--down); }
+.alert-success { background: var(--up-soft);   color: #14603f; border-left: 4px solid var(--up); }
+
+/* --------------------------------------------------------------- buttons */
+
+.btn { font-weight: 600; border-radius: 9px; }
+
+.btn-primary {
+    background-color: var(--navy-600);
+    border-color: var(--navy-600);
+    color: #fff;
 }
 
 .btn-primary:hover,
-.submit-btn:hover {
-    background-color: #001e63 !important;
-    border-color: #001e63 !important;
+.btn-primary:focus,
+.btn-primary:active {
+    background-color: var(--navy-700) !important;
+    border-color: var(--navy-700) !important;
+    color: #fff !important;
 }
 
-/* Card Container */
-.trivia-card {
-    border: 1px solid #e9ecef !important;
-    border-radius: 1rem !important;
-    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.06) !important;
-    overflow: hidden;
-    background-color: #ffffff;
+.btn-success { background-color: var(--up); border-color: var(--up); }
+.btn-success:hover { background-color: #16694a; border-color: #16694a; }
+
+.btn-outline-danger { color: var(--down); border-color: #e6bdb9; }
+.btn-outline-danger:hover { background-color: var(--down); border-color: var(--down); }
+
+/* ----------------------------------------------------------------- forms */
+
+.form-control:focus,
+.form-select:focus {
+    border-color: var(--navy-500);
+    box-shadow: 0 0 0 3px rgba(42, 99, 163, .13);
 }
 
-/* Header matched to navbar blue */
-.trivia-header {
-    background-color: #001e63 !important;
-    color: #ffffff;
-    padding: 1.5rem !important;
-    border: none !important;
+.form-label { font-size: .82rem; color: var(--gray-700); }
+
+/* ---------------------------------------------------------------- badges */
+
+.badge { font-weight: 600; letter-spacing: .02em; }
+.text-success { color: var(--up) !important; }
+.text-danger  { color: var(--down) !important; }
+
+/* ------------------------------------------------------------ stat tiles */
+
+.stat-tile {
+    background: #fff;
+    border: 1px solid var(--gray-200);
+    border-radius: var(--radius);
+    padding: 1rem 1.1rem;
+    height: 100%;
 }
+
+.stat-tile .stat-label {
+    font-size: .7rem;
+    letter-spacing: .09em;
+    text-transform: uppercase;
+    color: var(--gray-500);
+    font-weight: 600;
+}
+
+.stat-tile .stat-value {
+    font-family: var(--mono);
+    font-variant-numeric: tabular-nums;
+    font-size: 1.6rem;
+    font-weight: 600;
+    color: var(--navy-900);
+    margin-top: .2rem;
+}
+
+.stat-tile.accent {
+    background: linear-gradient(140deg, var(--navy-800), var(--navy-600));
+    border-color: var(--navy-700);
+}
+
+.stat-tile.accent .stat-label { color: rgba(255, 255, 255, .68); }
+.stat-tile.accent .stat-value { color: #fff; }
+
+/* ------------------------------------------------------------ auth pages */
+
+.auth-card { max-width: 430px; margin: 2.5rem auto; }
+.auth-card .card-body { padding: 2rem 1.9rem; }
+
+/* ---------------------------------------------------------------- trivia */
 
 .trivia-badge {
-    background-color: rgba(255, 255, 255, 0.15) !important;
-    color: #ffffff !important;
-    padding: 0.4rem 0.9rem !important;
-    border-radius: 50rem !important;
-    font-weight: 600;
-    font-size: 0.85rem;
-    border: 1px solid rgba(255, 255, 255, 0.2);
-}
-
-/* Balance Section */
-.balance-box {
-    background-color: #f8f9fa;
-    padding: 1.5rem;
-    border-radius: 0.75rem;
-    text-align: center;
-    margin-bottom: 1.5rem;
-    border: 1px solid #e9ecef;
-}
-
-.balance-label {
-    text-transform: uppercase;
-    letter-spacing: 0.05em;
-    color: #6c757d;
-    font-weight: 700;
-    font-size: 0.8rem;
-}
-
-.balance-amount {
-    font-size: 2.25rem;
-    font-weight: 800;
-    color: #001e63;
-    margin-top: 0.25rem;
-    margin-bottom: 0;
-}
-
-/* Question & Reward */
-.reward-badge {
-    background-color: #eef2f6;
-    color: #0A2F7A;
-    border: 1px solid #d0d7de;
-    padding: 0.4rem 0.85rem;
+    background: rgba(255, 255, 255, .15);
+    color: #fff;
+    border: 1px solid rgba(255, 255, 255, .25);
     border-radius: 50rem;
+    padding: .35rem .85rem;
     font-weight: 600;
-    font-size: 0.85rem;
+    font-size: .82rem;
 }
 
-.question-text {
-    font-weight: 600;
-    color: #212529;
-    line-height: 1.4;
-}
-
-/* Radio Option Cards */
 .option-label {
     width: 100%;
     text-align: left;
-    color: #343a40;
-    background-color: #ffffff;
-    border: 1px solid #dee2e6 !important;
-    padding: 0.9rem 1rem !important;
-    border-radius: 0.5rem !important;
+    color: var(--gray-800);
+    background: #fff;
+    border: 1px solid var(--gray-200) !important;
+    padding: .85rem 1rem !important;
+    border-radius: 10px !important;
     display: flex;
     align-items: center;
-    gap: 0.75rem;
-    transition: background-color 0.2s ease, border-color 0.2s ease;
+    gap: .8rem;
     cursor: pointer;
+    transition: background-color .15s ease, border-color .15s ease;
 }
 
-.option-label:hover {
-    background-color: #f8f9fa;
-    border-color: #ced4da !important;
-}
+.option-label:hover { background: var(--gray-50); border-color: var(--gray-300) !important; }
 
 .btn-check:checked + .option-label {
-    background-color: #f0f4fa !important;
-    border-color: #0A2F7A !important;
-    color: #001e63 !important;
+    background: var(--navy-100) !important;
+    border-color: var(--navy-600) !important;
+    color: var(--navy-900) !important;
     font-weight: 600;
 }
 
 .option-prefix {
-    background-color: #e9ecef;
-    color: #495057;
-    border: 1px solid #ced4da;
+    flex: 0 0 28px;
+    height: 28px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    background: var(--gray-100);
+    color: var(--gray-700);
+    border: 1px solid var(--gray-200);
+    border-radius: 8px;
+    font-family: var(--mono);
     font-weight: 700;
-    padding: 0.25rem 0.55rem;
-    border-radius: 0.375rem;
-    text-transform: uppercase;
-    font-size: 0.85rem;
+    font-size: .8rem;
 }
 
 .btn-check:checked + .option-label .option-prefix {
-    background-color: #0A2F7A;
-    color: #ffffff;
-    border-color: #0A2F7A;
+    background: var(--navy-600);
+    border-color: var(--navy-600);
+    color: #fff;
 }
 
-/* Cooldown */
-.cooldown-box {
-    background-color: #f8f9fa;
-    border: 1px solid #dee2e6;
-    border-radius: 0.75rem;
-    padding: 1.25rem;
-    text-align: center;
+/* ---------------------------------------------------------------- footer */
+
+.site-footer {
+    border-top: 1px solid var(--gray-200);
+    background: #fff;
+    padding: 1.4rem 0;
+    margin-top: 3rem;
+    font-size: .84rem;
+    color: var(--gray-500);
 }

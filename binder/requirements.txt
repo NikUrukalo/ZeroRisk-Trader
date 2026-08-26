@@ -2,4 +2,10 @@ bottle>=0.13.2
 psycopg2-binary>=2.9.9
 dataclasses-json>=0.6.4
 bcrypt>=4.1.2
+
+# Needed by the background price refresh that runs when the app is opened.
+yfinance>=0.2.40
+pandas>=2.0.0
+
+# Puts the app behind a URL on mybinder.org.
 jupyter-server-proxy>=4.1.0

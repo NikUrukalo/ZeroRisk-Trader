@@ -66,8 +66,8 @@
                                             autocomplete="off" 
                                             required
                                         >
-                                        <label class="btn btn-outline-light text-dark text-start w-100 p-3 rounded-3 border d-flex align-items-center gap-3 shadow-sm-hover" for="option_{{opt}}">
-                                            <span class="badge bg-secondary-subtle text-secondary rounded-circle px-2 py-1 text-uppercase fw-bold">{{opt}}</span>
+                                        <label class="option-label" for="option_{{opt}}">
+                                            <span class="option-prefix">{{opt.upper()}}</span>
                                             <span>{{question['option_' + opt]}}</span>
                                         </label>
                                     </div>

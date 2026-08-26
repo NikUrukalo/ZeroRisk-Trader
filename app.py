@@ -16,6 +16,7 @@ import psycopg2
 
 from Services.auth_service import AuthService
 from Services.trading_services import TradingService
+from Services import price_service
 
 
 # Setting up the app
@@ -39,9 +40,7 @@ def cookie_required(f):
         if cookie:
             return f(*args, **kwargs)
 
-        # bottleext.redirect() takes a bare path and turns it into an absolute
-        # URL itself - do NOT wrap it in url(), or the proxy prefix ends up on
-        # the Location header twice.
+        # redirect() takes a bare path - see bottleext.py
         return redirect('/login')
 
     return decorated
@@ -49,17 +48,7 @@ def cookie_required(f):
 
 
 def parse_quantity(raw):
-    """
-    Turn the quantity field into a float, or raise ValueError with a message
-    meant for the user.
-
-    The old code called float(request.forms.get('quantity')) directly. An
-    empty box or a typo raised
-        ValueError: could not convert string to float: ''
-    which Bottle turned into a 500 page with a traceback on it. Both trade
-    routes already catch ValueError and show `error=str(e)`, so raising a
-    readable ValueError here is all that is needed.
-    """
+    """Form field -> float, or ValueError with a message for the user."""
     raw = (raw or '').strip().replace(',', '.')
 
     if not raw:
@@ -92,6 +81,10 @@ def serve_static(filename):
 @app.route('/')
 @app.route('/login', name='login')
 def login_get():
+    # Kick off a price refresh in the background when someone opens the app.
+    # Returns straight away; the page is never held up by it.
+    price_service.maybe_refresh()
+
     return template(
         'login',
         user=None,
@@ -272,8 +265,6 @@ def trade_buy():
 
     try:
 
-        # Inside the try, so a bad quantity shows the same red banner as
-        # "Insufficient balance" instead of a 500 page.
         quantity = parse_quantity(
             request.forms.get('quantity')
         )
@@ -319,8 +310,6 @@ def trade_sell():
 
     try:
 
-        # Inside the try, so a bad quantity shows the same red banner as
-        # "Insufficient balance" instead of a 500 page.
         quantity = parse_quantity(
             request.forms.get('quantity')
         )
@@ -403,11 +392,6 @@ def trivia_answer_post():
     username = request.get_cookie("user")
     user = auth.get_user_by_username(username)
 
-    # Both of these arrive straight from the browser and both can be missing:
-    # question_id if the form was submitted from a stale page, submitted_option
-    # if no radio was selected. int(None) and None.strip() are TypeError and
-    # AttributeError - neither is a ValueError, so neither was caught below,
-    # and both ended as a 500 page.
     question_id_raw = request.forms.get('question_id')
 
     submitted_option = request.forms.get(
@@ -507,9 +491,6 @@ def add_balance_post():
             'add_balance',
             user=username,
             balance=balance,
-            # add_balance.html reads `question` and `cooldown_remaining`.
-            # Leaving them out raised NameError inside the template, so every
-            # use of this route was a 500.
             question=None,
             cooldown_remaining=None,
             error=None,
@@ -565,8 +546,6 @@ def logout():
 
 if __name__ == '__main__':
 
-    # Read the port and host from the environment so that binder/start can
-    # set them without editing this file.
     run(
         app,
         host=os.environ.get("BOTTLE_HOST", "0.0.0.0"),

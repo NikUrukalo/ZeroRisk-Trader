@@ -11,31 +11,25 @@
                 </div>
             % end
 
-            <!-- Summary Card -->
-            <div class="card border-0 shadow-sm rounded-4 mb-4">
-                <div class="card-header bg-white border-bottom p-3">
-                    <h5 class="mb-0 fw-bold text-dark">Account Overview</h5>
+            <h4 class="fw-bold mb-3">Account overview</h4>
+
+            <div class="row g-3 mb-4">
+                <div class="col-md-4">
+                    <div class="stat-tile">
+                        <div class="stat-label">Cash balance</div>
+                        <div class="stat-value">{{'%.2f' % balance}} <small class="text-muted fs-6">EUR</small></div>
+                    </div>
                 </div>
-                <div class="card-body p-4">
-                    <div class="row g-3 text-center">
-                        <div class="col-md-4">
-                            <div class="bg-light p-3 rounded-3 border">
-                                <span class="text-muted small fw-medium text-uppercase">Cash Balance</span>
-                                <h3 class="fw-bold mb-0 text-dark mt-1">{{'%.2f' % balance}} <small class="fs-6 text-muted">EUR</small></h3>
-                            </div>
-                        </div>
-                        <div class="col-md-4">
-                            <div class="bg-light p-3 rounded-3 border">
-                                <span class="text-muted small fw-medium text-uppercase">Holdings Value</span>
-                                <h3 class="fw-bold mb-0 text-dark mt-1">{{'%.2f' % holdings_value}} <small class="fs-6 text-muted">EUR</small></h3>
-                            </div>
-                        </div>
-                        <div class="col-md-4">
-                            <div class="bg-light p-3 rounded-3 border">
-                                <span class="text-muted small fw-medium text-uppercase">Total Value</span>
-                                <h3 class="fw-bold mb-0 text-primary mt-1">{{'%.2f' % total_value}} <small class="fs-6 text-muted">EUR</small></h3>
-                            </div>
-                        </div>
+                <div class="col-md-4">
+                    <div class="stat-tile">
+                        <div class="stat-label">Holdings value</div>
+                        <div class="stat-value">{{'%.2f' % holdings_value}} <small class="text-muted fs-6">EUR</small></div>
+                    </div>
+                </div>
+                <div class="col-md-4">
+                    <div class="stat-tile accent">
+                        <div class="stat-label">Total value</div>
+                        <div class="stat-value">{{'%.2f' % total_value}} <small class="fs-6">EUR</small></div>
                     </div>
                 </div>
             </div>
