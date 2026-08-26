@@ -91,8 +91,35 @@ def quiz_error(exc):
         return ("The quiz tables are missing. Run Data/create_database.sql "
                 "and Data/trivia_questions.sql on the database.")
 
-    return ("The quiz is unavailable right now. The reason is in "
+    if isinstance(exc, (psycopg2.errors.QueryCanceled,
+                        psycopg2.errors.LockNotAvailable)):
+        return ("The database did not answer in time - another session is "
+                "probably holding a lock on the quiz tables. Open /diag for "
+                "details.")
+
+    return ("The quiz is unavailable right now. Open /diag, or read "
             "/tmp/zerorisk.log.")
+
+
+# Diagnostics
+@app.route('/diag')
+def diag():
+    """
+    Plain-text report of what the app's database account can reach. No login,
+    because it has to work when logging in is what is broken. It shows table
+    names and row counts only.
+    """
+    from Data import check_access
+
+    response.content_type = 'text/plain; charset=utf-8'
+
+    try:
+        lines, _ = check_access.collect()
+    except Exception:
+        traceback.print_exc()
+        return 'The check itself failed. See /tmp/zerorisk.log.\n'
+
+    return '\n'.join(lines) + '\n'
 
 
 # Static files

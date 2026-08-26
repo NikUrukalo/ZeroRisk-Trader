@@ -5,7 +5,7 @@
 
 from contextlib import contextmanager
 
-import psycopg2, psycopg2.extensions, psycopg2.extras # PostgreSQL database adapter for the Python and extensions
+import psycopg2, psycopg2.extensions, psycopg2.extras, psycopg2.errors # PostgreSQL database adapter for the Python and extensions
 psycopg2.extensions.register_type(psycopg2.extensions.UNICODE) # a fix for šumniki (č, š, ž)
 from Data import auth_public as auth
 import os
@@ -14,6 +14,15 @@ from Data.models import *
 from typing import List, Optional # library for type hints
 
 DB_PORT = os.environ.get('POSTGRES_PORT', 5432) # default PostgreSQL port
+
+# No single query may run longer than this, and no query waits longer than
+# LOCK_TIMEOUT_MS for a lock someone else holds. Without them a table locked by
+# an open psql/pgAdmin transaction makes the page load forever with no error.
+STATEMENT_TIMEOUT_MS = int(os.environ.get('PG_STATEMENT_TIMEOUT_MS', 20000))
+LOCK_TIMEOUT_MS = int(os.environ.get('PG_LOCK_TIMEOUT_MS', 5000))
+
+CONNECT_OPTIONS = (f'-c statement_timeout={STATEMENT_TIMEOUT_MS} '
+                   f'-c lock_timeout={LOCK_TIMEOUT_MS}')
 
 
 class Repo:
@@ -28,7 +37,8 @@ class Repo:
                                      port=DB_PORT,
                                      connect_timeout=10,
                                      keepalives=1,
-                                     keepalives_idle=30)
+                                     keepalives_idle=30,
+                                     options=CONNECT_OPTIONS)
         # rows come back as dictionaries, not tuples
         self.cur = self.conn.cursor(cursor_factory=psycopg2.extras.DictCursor)
 
@@ -42,15 +52,32 @@ class Repo:
         """
         try:
             self.cur.execute(sql, params)
+
+        except (psycopg2.errors.QueryCanceled,
+                psycopg2.errors.LockNotAvailable):
+            # A timeout is a subclass of OperationalError, but the connection
+            # is alive: reconnecting and retrying would only wait again and
+            # would leave the transaction aborted, breaking every later page.
+            self._rollback()
+            raise
+
         except (psycopg2.InterfaceError, psycopg2.OperationalError):
             self._connect()
-            self.cur.execute(sql, params)
-        except Exception:
             try:
-                self.conn.rollback()
+                self.cur.execute(sql, params)
             except Exception:
-                pass
+                self._rollback()
+                raise
+
+        except Exception:
+            self._rollback()
             raise
+
+    def _rollback(self):
+        try:
+            self.conn.rollback()
+        except Exception:
+            pass
 
     @contextmanager
     def transaction(self):
