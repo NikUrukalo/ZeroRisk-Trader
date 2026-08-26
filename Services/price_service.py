@@ -11,6 +11,18 @@ from Data.repository import Repo
 REFRESH_INTERVAL = int(os.environ.get('PRICE_REFRESH_SECONDS', 600))
 BATCH_SIZE = 40
 
+# Binder containers run on UTC, so every time the app printed was an hour or
+# two behind Slovenian time. Timestamps are shown, and written, in this zone.
+try:
+    from zoneinfo import ZoneInfo
+    APP_TZ = ZoneInfo(os.environ.get('APP_TIMEZONE', 'Europe/Ljubljana'))
+except Exception:
+    APP_TZ = None
+
+
+def now():
+    return datetime.now(APP_TZ)
+
 _lock = threading.Lock()
 _last_success = 0.0
 _last_error = None
@@ -22,7 +34,7 @@ def status():
     with _lock:
         return {
             'running': _running,
-            'last_success': (datetime.fromtimestamp(_last_success)
+            'last_success': (datetime.fromtimestamp(_last_success, APP_TZ)
                              if _last_success else None),
             'last_error': _last_error,
         }
@@ -85,9 +97,9 @@ def _refresh(fetcher=None):
 
 
 def _to_rows(prices):
-    now = datetime.now()
-    date_stamp = now.date()
-    time_stamp = now.time().replace(microsecond=0)
+    stamped = now()
+    date_stamp = stamped.date()
+    time_stamp = stamped.time().replace(microsecond=0)
 
     rows = []
     for symbol, value in (prices or {}).items():

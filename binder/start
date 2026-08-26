@@ -9,6 +9,11 @@ export BOTTLE_DEBUG=0
 
 export POSTGRES_PORT=443
 
+# Binder containers run on UTC. Without this the times on the page are an
+# hour or two behind Slovenian time.
+export TZ=Europe/Ljubljana
+export APP_TIMEZONE=Europe/Ljubljana
+
 # Start the app in the background and keep its output, so that if the page
 # stays blank you can open a Binder terminal and read the traceback:
 #     cat /tmp/zerorisk.log

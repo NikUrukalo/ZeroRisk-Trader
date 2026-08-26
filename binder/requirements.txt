@@ -9,3 +9,7 @@ pandas>=2.0.0
 
 # Puts the app behind a URL on mybinder.org.
 jupyter-server-proxy>=4.1.0
+
+# So Europe/Ljubljana resolves even if the image ships without the system
+# timezone database.
+tzdata>=2024.1
