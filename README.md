@@ -80,24 +80,6 @@ python app.py
 
 The app connects to the faculty database as the shared `javnost` role, so no extra configuration is needed.
 
-### 5. Prepare the database (first time only)
-
-If the tables don't exist yet, create them as the **owner** of the database (your personal FMF account — `javnost` cannot create tables):
-
-```bash
-psql -h baza.fmf.uni-lj.si -U <your_account> -d sem2026_nejczi -f Data/create_database.sql
-psql -h baza.fmf.uni-lj.si -U <your_account> -d sem2026_nejczi -f Data/grants.sql
-psql -h baza.fmf.uni-lj.si -U <your_account> -d sem2026_nejczi -f Data/trivia_questions.sql
-```
-
-Then fill the asset catalogue:
-
-```bash
-cd "Data scraping"
-python fill_asset_master.py
-python fill_asset.py
-```
-
 Open **http://localhost:8080** and stop the app anytime with `Ctrl+C`.
 
 ---
