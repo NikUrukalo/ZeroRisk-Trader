@@ -25,7 +25,7 @@ every order is priced against the latest stored snapshot.
 ---
 
 ## ER Diagram:
-<img width="2035" height="810" alt="ZeroRisk_Trader drawio" src="https://github.com/user-attachments/assets/b496ff36-a21e-489a-88e0-c251265c42e0" />
+<img width="2146" height="870" alt="ZeroRisk_Trader drawio (1)" src="https://github.com/user-attachments/assets/87799eb9-41e5-424e-9bc4-ecbb1f2b263f" />
 
 The database has **eight tables**:
 
