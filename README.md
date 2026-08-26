@@ -88,7 +88,6 @@ Open **http://localhost:8080** and stop the app anytime with `Ctrl+C`.
 
 When anyone opens the login page, a price refresh starts **in the background**. `Services/price_service.py` reads the symbols from `asset_master`, downloads the latest prices from Yahoo Finance, converts them from USD to EUR, and writes a new snapshot into the `asset` table.
 
-- The page never waits for it — it renders in a few milliseconds.
 - At least 10 minutes must pass between two refreshes (`PRICE_REFRESH_SECONDS`).
 - If Yahoo can't be reached, the error is only logged; the previous snapshot stays in the database and the app keeps working.
 
@@ -106,4 +105,4 @@ On the **Earn balance** page, users answer finance questions. A correct answer c
 
 Prices come from [Yahoo Finance](https://finance.yahoo.com) via the `yfinance` library and are converted from USD to EUR at the rate of the moment they were scraped. These are delayed snapshots, not a live feed.
 
-> This is a student project for practicing database design. Nothing in it is investment advice, and no real money is involved.
+> NOTE: This is a student project for practicing database design. Nothing in it is investment advice, and no real money is involved.
